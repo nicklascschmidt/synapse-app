@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import './App.css';
 import Home from './pages/home/home';
+import Main from './pages/main/main';
+import Nav from './components/nav/nav';
 
 
 class App extends Component {
@@ -13,19 +15,9 @@ class App extends Component {
     return (
       <Router>
         <div className='wrapper'>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              {/* <li>
-                <Link to="/app/">About</Link>
-              </li> */}
-            </ul>
-          </nav>
-
+          <Nav />
           <Route path="/" exact component={Home} />
-          {/* <Route path="/app/" component={Login} /> */}
+          <Route path="/main" component={Main} />
         </div>
       </Router>
     );

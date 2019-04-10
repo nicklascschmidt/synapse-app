@@ -39,15 +39,36 @@ app.get('/login/:id', (req, res) => {
     client,
     options,
     function (errResp, userResponse) {
-      user = userResponse.json;
+      user = userResponse;
 
       if (errResp) {
         res.status(errResp.status).send(errResp.body);
       } else {
-        res.send(user);
+        res.send(userResponse.json);
       }
     }
   );
+});
+
+// Imports
+const Nodes = SynapsePay.Nodes;
+
+let nodes;
+
+app.get('/nodes/get-all', (req, res) => {
+  console.log('/nodes/get-all HIT!!');
+  console.log('user',user);
+  // Get All Nodes
+  Nodes.get(
+    user,
+    null,
+    function (err, nodesResponse) {
+      // error or array of node objects
+      nodes = nodesResponse;
+      console.log('nodes',nodes);
+    }
+  );
+  res.json(nodes);
 });
 
 

@@ -4,10 +4,13 @@ import Login from '../../components/login/login';
 import { Row, Col } from 'reactstrap';
 
 class Home extends Component {
-  // constructor(props) {
-  //   super(props)
+  constructor(props) {
+    super(props)
 
-  // }
+    this.state = {
+      
+    }
+  }
 
   render() {
     return (
