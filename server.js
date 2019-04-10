@@ -25,24 +25,49 @@ const client = new Clients(
 const Users = SynapsePay.Users;
 
 // Get All Users
+// let options = {
+//   ip_address: Helpers.getUserIP(),
+//   page: '', //optional
+//   per_page: '', //optional
+//   query: '' //optional
+// };
+
+// let users;
+// Users.get(
+//   client,
+//   options,
+//   function(err, usersResponse) {
+//     // error or array of user objects
+//     users = usersResponse;
+//     console.log('users',users);
+//     (err) && console.log('err',err);
+//   }
+// );
+
+let user;
+
 let options = {
+  _id: '5cad5098eaf3f30067380c7c', // USER_ID
+  fingerprint: '123456', // USER_FINGERPRINT
   ip_address: Helpers.getUserIP(),
-  page: '', //optional
-  per_page: '', //optional
-  query: '' //optional
+  full_dehydrate: 'yes' //optional
 };
 
-let users;
 Users.get(
   client,
   options,
-  function(err, usersResponse) {
-    // error or array of user objects
-    users = usersResponse;
-    console.log('users',users);
-    (err) && console.log('err',err);
+  function(errResp, userResponse) {
+    // error or user object
+    user = userResponse;
+    console.log('user',user);
   }
 );
+
+
+// const nodeID = '5cad55f170fe0a6f9fd36d37';
+
+// user.triggerDummyTransactions(nodeID);
+
 
 
 
