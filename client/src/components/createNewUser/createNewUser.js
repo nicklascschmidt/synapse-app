@@ -19,17 +19,28 @@ class CreateNewUser extends Component {
     this.createNewUser(this.state.name);
   }
 
+  // Create the user in API, then send user info to Redux.
   createNewUser = (name) => {
     axios
       .get(`/user/create/${name}`)
       .then(resp => {
-        console.log('resp',resp.data.json);
         let name = resp.data.json.legal_names[0];
         let userId = resp.data.json._id;
         this.sendToRedux(name, userId, this.reroutePage);
+        this.createNewNode();
       })
       .catch(err => {
         this.setState({ error: 'Unable to create account. Please reload the page and try again.' });
+      });
+  }
+
+  // Create the node in API to user for transactions in the app.
+  createNewNode = () => {
+    axios
+      .get('/nodes/create')
+      .then(resp => resp)
+      .catch(err => {
+        this.setState({ error: 'Unable to create account node. Please reload the page and try again.' });
       });
   }
 
