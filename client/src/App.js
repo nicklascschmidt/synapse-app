@@ -4,6 +4,7 @@ import './App.css';
 import Home from './pages/home/home';
 import Main from './pages/main/main';
 import Nav from './components/nav/nav';
+import { Container } from 'reactstrap';
 
 
 class App extends Component {
@@ -13,13 +14,15 @@ class App extends Component {
 
   render() {
     return (
-      <Router>
-        <div className='wrapper'>
+      <div className='wrapper'>
+        <Router>
           <Nav />
-          <Route path="/" exact component={Home} />
-          <Route path="/main" component={Main} />
-        </div>
-      </Router>
+          <Container>
+            <Route path="/" exact component={Home} />
+            <Route path="/main" component={Main} />
+          </Container>
+        </Router>
+      </div>
     );
   }
 }

@@ -45,11 +45,11 @@ app.get('/login/:id', (req, res) => {
   Users.get(
     client,
     options,
-    function (errResp, userResponse) {
+    function (err, userResponse) {
       user = userResponse;
 
-      if (errResp) {
-        res.status(errResp.status).send(errResp.body);
+      if (err) {
+        res.status(err.status).send(err.body);
       } else {
         res.send(userResponse.json);
       }
@@ -67,18 +67,41 @@ let nodes;
 
 app.get('/nodes/get-all', (req, res) => {
   console.log('/nodes/get-all HIT!!');
-  console.log('user', user);
+  // console.log('user', user);
   // Get All Nodes
   Nodes.get(
     user,
     null,
-    function (errResp, nodesResponse) {
+    function (err, nodesResponse) {
       nodes = nodesResponse;
-      console.log('nodes', nodes);
-      if (errResp) {
-        res.status(errResp.status).send(errResp.body);
+      if (err) {
+        res.status(err.status).send(err.body);
       } else {
         res.send(nodesResponse.nodes);
+      }
+    }
+  );
+});
+
+let node;
+
+// Get a Specific Node
+app.get('/nodes/get-one/:id', (req, res) => {
+  console.log('/nodes/get-one/:id hit');
+
+  Nodes.get(
+    user,
+    {
+      _id: req.params.id,
+      full_dehydrate: 'yes' //optional
+    },
+    function(err, nodeResponse) {
+      // error or node object
+      node = nodeResponse;
+      if (err) {
+        res.status(err.status).send(err.body);
+      } else {
+        res.end();
       }
     }
   );
@@ -90,23 +113,25 @@ app.get('/nodes/get-all', (req, res) => {
 // Imports
 const Transactions = SynapsePay.Transactions;
 
-app.get('/transactions/add/:amount', (req, res) => {
-  console.log('HIT /transactions/add/:amount');
-  console.log('req.params',req.params);
-  
-  // Create a Transaction
+// Create transaction
+app.get('/transactions/add', async (req, res) => {
+  // params accessible in req.query
+  console.log('HIT /transactions/add');
+  // console.log('user',user);
+
+  // Create a Transaction. Ignore fees bc not production.
   const createPayload = {
     to: {
       type: 'SYNAPSE-US',
-      id: '5cad55f170fe0a6f9fd36d37' // TO_NODE_ID TODO: return to variable
+      id: req.query.activeNodeId // TO_NODE_ID
     },
     amount: {
-      amount: 1.10, // TODO: req.params then turn into ## - parseInt()
+      amount: parseFloat(req.query.transactionAmt),
       currency: 'USD'
     },
     extra: {
       supp_id: '1283764wqwsdd34wd13212',
-      note: 'Deposit to bank account',
+      note: 'TEST - Deposit to bank account',
       webhook: 'http://requestb.in/q94kxtq9',
       process_on: 1,
       ip: Helpers.getUserIP()
@@ -128,6 +153,12 @@ app.get('/transactions/add/:amount', (req, res) => {
     function (err, transactionResp) {
       // error or transaction object
       transaction = transactionResp;
+      console.log('transaction',transaction);
+      if (err) {
+        res.status(err.status).send(err.body);
+      } else {
+        res.send(transactionResp.json);
+      }
     }
   );
 });
