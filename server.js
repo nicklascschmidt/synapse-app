@@ -34,7 +34,7 @@ const Users = SynapsePay.Users;
 let user;
 
 // Get user from API with userId, save in 'user' var.
-app.get('/login/:id', (req, res) => {
+app.get('/user/login/:id', (req, res) => {
   let options = {
     _id: req.params.id, // USER_ID
     fingerprint: process.env.FINGERPRINT, // USER_FINGERPRINT
@@ -57,6 +57,49 @@ app.get('/login/:id', (req, res) => {
   );
 });
 
+// Create a User, then create a node
+app.get('/user/create/:name', (req, res) => {
+  console.log('req.params',req.params);
+
+  const createPayload = {
+    logins: [
+      {
+        email: `jsTestUser${req.params.name}@synapsepay.com`,
+        read_only: false
+      }
+    ],
+    phone_numbers: [
+      '901.111.1111'
+    ],
+    legal_names: [
+      `${req.params.name}`
+    ],
+    extra: {
+      note: `Test user: ${req.params.name}`,
+      supp_id: '122eddfgbeafrfvbbb',
+      is_business: false
+    }
+  };
+  
+  Users.create(
+    client,
+    // fingerprint (specific to user or static for application)
+    process.env.FINGERPRINT,
+    Helpers.getUserIP(),
+    createPayload,
+    function(err, userResponse) {
+      user = userResponse;
+      if (err) {
+        res.status(err.status).send(err.body);
+      } else {
+        res.send(userResponse);
+      }
+    }
+  );
+
+  
+});
+
 
 // ------------------- Nodes --------------------------
 
@@ -65,10 +108,10 @@ const Nodes = SynapsePay.Nodes;
 
 let nodes;
 
+// Get All Nodes
 app.get('/nodes/get-all', (req, res) => {
   console.log('/nodes/get-all HIT!!');
-  // console.log('user', user);
-  // Get All Nodes
+  console.log('user', user);
   Nodes.get(
     user,
     null,
@@ -96,7 +139,6 @@ app.get('/nodes/get-one/:id', (req, res) => {
       full_dehydrate: 'yes' //optional
     },
     function(err, nodeResponse) {
-      // error or node object
       node = nodeResponse;
       if (err) {
         res.status(err.status).send(err.body);

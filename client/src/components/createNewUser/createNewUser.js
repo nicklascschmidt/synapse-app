@@ -1,40 +1,35 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
+import { Form, FormGroup, Button, Input, Label } from 'reactstrap';
 import axios from 'axios';
 import Error from '../error/error';
-import { Form, FormGroup, Button, Input, Label } from 'reactstrap';
 
-class Login extends Component {
+class CreateNewUser extends Component {
   constructor(props) {
     super(props)
-
+    
     this.state = {
-      userId: '5cad5098eaf3f30067380c7c',
+      name: '',
       error: null,
     }
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
-    this.tryUserLogin(this.state);
+    this.createNewUser(this.state.name);
   }
 
-  tryUserLogin = (state) => {
-    // Get user from the API with userId.
-    // If the user exists (userId), send user data to Redux and reroute page to Main. Else, show error.
-    let { userId } = state;
+  createNewUser = (name) => {
     axios
-      .get(`/user/login/${userId}`)
+      .get(`/user/create/${name}`)
       .then(resp => {
-        if (resp.status === 200) {
-          let name = resp.data.legal_names[0];
-          this.sendToRedux(name, userId, this.reroutePage);
-        } else {
-          this.setState({ error: 'Connection error. Please try again.' });
-        }
+        console.log('resp',resp.data.json);
+        let name = resp.data.json.legal_names[0];
+        let userId = resp.data.json._id;
+        this.sendToRedux(name, userId, this.reroutePage);
       })
       .catch(err => {
-        this.setState({ error: 'Unable to locate account. Please try another User ID.' });
+        this.setState({ error: 'Unable to create account. Please reload the page and try again.' });
       });
   }
 
@@ -54,15 +49,15 @@ class Login extends Component {
   render() {
     return (
       <div>
-        <h3>Login</h3>
+        <h3>Create New User</h3>
         <Form onSubmit={this.handleSubmit}>
           <FormGroup>
-            <Label>User ID:</Label>
+            <Label>Name:</Label>
             <Input
               style={{ width: '20rem', margin: 'auto' }}
               type="text"
-              value={this.state.userId}
-              onChange={e => this.setState({ userId: e.target.value })}
+              value={this.state.name}
+              onChange={e => this.setState({ name: e.target.value })}
             />
           </FormGroup>
           <Button type="submit" style={{ display: 'block', margin: 'auto' }}>Submit</Button>
@@ -81,4 +76,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps)(Login);
+export default connect(mapStateToProps)(CreateNewUser);

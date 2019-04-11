@@ -16,8 +16,6 @@ class Main extends Component {
       transactionAmt: 0,
       error: null,
       userLoaded: false,
-      userNodes: null,
-      nodeArrayIsEmpty: null,
       activeNodeId: null,
       showMessage: null,
       confirmationMessage: null,
@@ -27,37 +25,11 @@ class Main extends Component {
   // First GET the user object in server.js. Nodes & Transaction API calls won't work without the user object loaded.
   // When complete, get the nodes and show in display.
   // Then show the submit button (i.e. allow user to submit transactions).
-  componentDidMount = async () => {
+  componentWillMount = async () => {
     let loginUserComplete = await this.loginUser(this.state.userId);
     if (loginUserComplete) {
       this.setState({ userLoaded: true });
-      this.getNodes();
     }
-  }
-
-  // Get nodes and save into this.state. If the nodeArray is empty, then display msg (nodeArrayIsEmpty=true).
-  getNodes = () => {
-    axios
-      .get('/nodes/get-all')
-      .then(resp => {
-        if (resp.status !== 200) {
-          this.setState({ error: 'Connection error. Please try again.' });
-          return
-        }
-
-        let nodeArray = resp.data;
-        let nodeArrayLength = resp.data.length;
-        console.log('nodeArray', nodeArray);
-
-        if (nodeArrayLength > 0) {
-          this.setState({ userNodes: nodeArray });
-        } else {
-          this.setState({ nodeArrayIsEmpty: true });
-        }
-      })
-      .catch(err => {
-        this.setState({ error: 'catch block hit' });
-      });
   }
 
   // Button will not show until userLoaded=true. activeNodeId is set on radio button click (on a Node/Account).
@@ -70,6 +42,7 @@ class Main extends Component {
     }
   }
 
+  // Submit the transaction and show confirmation message if success, error if fail.
   tryTransactionSubmit = (state) => {
     let { userId, transactionAmt, activeNodeId } = state;
     let params = { userId, transactionAmt, activeNodeId };
@@ -80,23 +53,26 @@ class Main extends Component {
           this.setState({ error: 'Connection error. Please try again.' });
           return
         }
-        // Show confirmation message
-        this.setState({ showMessage: true, confirmationMessage: 'Transaction submitted!' });
-        setTimeout(this.hideMsg, 3000);
+        // Show confirmation message for 3 seconds.
+        this.setState({
+          showMessage: true,
+          confirmationMessage: 'Transaction submitted!'
+        });
+        setTimeout(this.hideMessage, 3*1000);
       })
       .catch(err => {
         this.setState({ error: 'We ran into an error submitting your transaction. Please reload the page or try logging in again.' });
       });
   }
 
-  hideMsg = () => {
+  hideMessage = () => {
     this.setState({ showMessage: false });
   }
 
   // Loads 'user' var in server.js. userId comes from Redux store.
   loginUser = (userId) => {
     return axios
-      .get(`/login/${userId}`)
+      .get(`/user/login/${userId}`)
       .then(resp => {
         if (resp.status !== 200) {
           this.setState({ error: 'Connection error. Please try again.' });
@@ -118,13 +94,12 @@ class Main extends Component {
   }
 
   render() {
-    return (
-      <div>
-        <h3>Main</h3>
-        <Row>
+    let mainDisplay = !this.state.isLoggedIn
+      ? <p>Please log in first</p>
+      : (<div>
+          <Row>
           <Col>
-            {this.state.userNodes && <Nodes userNodes={this.state.userNodes} switchActiveNode={this.switchActiveNode} />}
-            {this.state.nodeArrayIsEmpty && 'No nodes to show.'}
+            {this.state.userLoaded && <Nodes switchActiveNode={this.switchActiveNode} />}
           </Col>
           <Col>
             <Form onSubmit={this.handleSubmit}>
@@ -145,6 +120,12 @@ class Main extends Component {
         </Row>
         <Error>{this.state.error && this.state.error}</Error>
         <SubmittedMsg>{this.state.showMessage && this.state.confirmationMessage}</SubmittedMsg>
+      </div>)
+
+    return (
+      <div>
+        <h3>Main</h3>
+        {mainDisplay}
       </div>
     )
   }

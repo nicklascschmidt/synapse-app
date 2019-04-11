@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Login from '../../components/login/login';
-// import Signup from '../../components/signup/signup';
+import CreateNewUser from '../../components/createNewUser/createNewUser';
 import { Row, Col } from 'reactstrap';
 
 class Home extends Component {
@@ -19,9 +19,9 @@ class Home extends Component {
           <Col>
             <Login />
           </Col>
-          {/* <Col>
-            <Signup />
-          </Col> */}
+          <Col>
+            <CreateNewUser />
+          </Col>
         </Row>
       </div>
     )

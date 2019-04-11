@@ -25,7 +25,7 @@ class Nav extends Component {
     return (
       <nav>
         <ul>
-          <li>{this.state.name}</li>
+          <li>{this.state.isLoggedIn && this.state.name}</li>
           <li>
             {logInOrOut}
           </li>
