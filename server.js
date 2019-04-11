@@ -10,6 +10,9 @@ const port = process.env.PORT || 5000;
 // ------------------- Synapse --------------------------
 // ------------------------------------------------------
 
+
+// ---------- Synapse Initialization / Client -----------
+
 const SynapsePay = require('synapsepay');
 const Clients = SynapsePay.Clients;
 const Helpers = SynapsePay.Helpers;
@@ -21,12 +24,16 @@ const client = new Clients(
   false
 );
 
+
+// ------------------- Users --------------------------
+
 // Imports
 const Users = SynapsePay.Users;
 
 // Global scope
 let user;
 
+// Get user from API with userId, save in 'user' var.
 app.get('/login/:id', (req, res) => {
   let options = {
     _id: req.params.id, // USER_ID
@@ -50,6 +57,9 @@ app.get('/login/:id', (req, res) => {
   );
 });
 
+
+// ------------------- Nodes --------------------------
+
 // Imports
 const Nodes = SynapsePay.Nodes;
 
@@ -57,18 +67,69 @@ let nodes;
 
 app.get('/nodes/get-all', (req, res) => {
   console.log('/nodes/get-all HIT!!');
-  console.log('user',user);
+  console.log('user', user);
   // Get All Nodes
   Nodes.get(
     user,
     null,
-    function (err, nodesResponse) {
-      // error or array of node objects
+    function (errResp, nodesResponse) {
       nodes = nodesResponse;
-      console.log('nodes',nodes);
+      console.log('nodes', nodes);
+      if (errResp) {
+        res.status(errResp.status).send(errResp.body);
+      } else {
+        res.send(nodesResponse.nodes);
+      }
     }
   );
-  res.json(nodes);
+});
+
+
+// ------------------- Transactions --------------------------
+
+// Imports
+const Transactions = SynapsePay.Transactions;
+
+app.get('/transactions/add/:amount', (req, res) => {
+  console.log('HIT /transactions/add/:amount');
+  console.log('req.params',req.params);
+  
+  // Create a Transaction
+  const createPayload = {
+    to: {
+      type: 'SYNAPSE-US',
+      id: '5cad55f170fe0a6f9fd36d37' // TO_NODE_ID TODO: return to variable
+    },
+    amount: {
+      amount: 1.10, // TODO: req.params then turn into ## - parseInt()
+      currency: 'USD'
+    },
+    extra: {
+      supp_id: '1283764wqwsdd34wd13212',
+      note: 'Deposit to bank account',
+      webhook: 'http://requestb.in/q94kxtq9',
+      process_on: 1,
+      ip: Helpers.getUserIP()
+    },
+    // fees: [{
+    //   fee: 1.00,
+    //   note: 'Facilitator Fee',
+    //   to: {
+    //     id: FEE_TO_NODE_ID
+    //   }
+    // }]
+  };
+
+  let transaction;
+
+  Transactions.create(
+    node,
+    createPayload,
+    function (err, transactionResp) {
+      // error or transaction object
+      transaction = transactionResp;
+    }
+  );
 });
 
 

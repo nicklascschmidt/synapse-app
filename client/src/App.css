@@ -6,9 +6,17 @@
 a {
   color: #61dafb;
 }
+a:hover {
+  color: white;
+  text-decoration: none;
+}
 
 .nav-link {
   color: #61dafb;
+}
+.nav-link:hover {
+  color: white;
+  cursor: pointer;
 }
 
 ul {

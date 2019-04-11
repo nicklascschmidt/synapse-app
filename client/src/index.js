@@ -31,13 +31,13 @@ const reducer = (state = initialState, action) => {
         userId: action.payload.userId,
         isLoggedIn: action.payload.isLoggedIn,
       }
-    // case 'USER_LOGOUT_REQUEST':
-    //   console.log('global state updated - user logged out');
-    //   return {
-    //     name: null,
-    //     userId: null,
-    //     isLoggedIn: false
-    //   }
+    case 'USER_LOGOUT_REQUEST':
+      console.log('global state updated - user logged out');
+      return {
+        name: null,
+        userId: null,
+        isLoggedIn: false
+      }
     default:
       return state;
   }

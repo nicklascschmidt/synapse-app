@@ -20,27 +20,35 @@ class Login extends Component {
   }
 
   tryUserLogin = (state) => {
+    // Get user from the API with userId.
+    // If the user exists (userId), send user data to Redux and reroute page to Main. Else, show error.
     let { userId } = state;
     axios
       .get(`/login/${userId}`)
       .then(resp => {
-        console.log('resp', resp);
-        let name = resp.data.legal_names[0];
-        // save userId and name into Redux -- more stuff too?
-        this.sendToRedux(name, userId);
+        if (resp.status === 200) {
+          let name = resp.data.legal_names[0];
+          this.sendToRedux(name, userId, this.reroutePage);
+        } else {
+          this.setState({ error: 'Connection error. Please try again.' });
+        }
       })
       .catch(err => {
         this.setState({ error: 'Unable to locate account. Please try another User ID.' });
       });
   }
 
-  sendToRedux = (name, userId) => {
-    const userData = { name, userId, isLoggedIn: true };
+  reroutePage = () => {
+    window.location = '/main';
+  }
 
+  sendToRedux = (name, userId, rerouteCB) => {
+    const userData = { name, userId, isLoggedIn: true };
     this.props.dispatch({
       type: "USER_LOGIN_REQUEST",
       payload: userData
     });
+    rerouteCB();
   }
 
   render() {

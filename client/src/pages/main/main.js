@@ -13,29 +13,28 @@ class Main extends Component {
       userId: this.props.userId,
       transactionAmt: 0,
       error: null,
+      userLoaded: false,
     }
   }
 
-  componentDidMount = () => {
-
+  componentDidMount = async () => {
+    // First GET the user object in server.js. Transactions won't work without the user object loaded.
+    // When complete, show the submit button (allow user to submit transactions)
+    let loginUserComplete = await this.loginUser(this.state.userId);
+    if (loginUserComplete) {
+      this.setState({ userLoaded: true});
+    }
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
-    // only allow this to submit if userId is not null in the redux store
-    // if it's null, then that means there's no user logged in and we can't pull nodes if there's no userId
-    // also need 'user' var in server or else it won't work
-    if (this.state.isLoggedIn) {
-      this.tryTransactionSubmit(this.state);
-    } else {
-      this.setState({ error: 'Please login to use the app.' });
-    }
+    // Button will not show until userLoaded is true
+    this.tryTransactionSubmit(this.state);
   }
 
   tryTransactionSubmit = (state) => {
-    let { userId, transactionAmt } = state;
-    console.log('userId', userId);
-    console.log('transactionAmt', transactionAmt);
+    // let { userId, transactionAmt } = state;
+    // console.log('transactionAmt', transactionAmt);
     axios
       .get('/nodes/get-all')
       .then(resp => {
@@ -46,17 +45,19 @@ class Main extends Component {
       });
   }
 
-  // Activates 'user' var in server.js. userId comes from Redux store
+  // Loads 'user' var in server.js. userId comes from Redux store.
   loginUser = (userId) => {
-    axios
+    return axios
       .get(`/login/${userId}`)
       .then(resp => {
-        console.log('resp', resp);
-        console.log('welcome~', resp.data.legal_names[0]);
-        // save userId and name into Redux -- more stuff too?
+        if (resp.status === 200) {
+          return true
+        } else {
+          this.setState({ error: 'Connection error. Please try again.' });
+        }
       })
       .catch(err => {
-        this.setState({ error: 'Unable to locate account. Please login again.' });
+        this.setState({ error: 'We ran into an error loading your account. Please reload the page or log in again.' });
       });
   }
 
@@ -74,7 +75,9 @@ class Main extends Component {
               onChange={e => this.setState({ transactionAmt: e.target.value })}
             />
           </FormGroup>
-          <Button type="submit" style={{ display: 'block', margin: 'auto' }}>Go</Button>
+          {this.state.userLoaded
+            ? <Button type="submit" style={{ display: 'block', margin: 'auto' }}>Go</Button>
+            : <p>loading...</p>}
         </Form>
         <Error>{this.state.error && this.state.error}</Error>
       </div>

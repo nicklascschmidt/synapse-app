@@ -1,27 +1,31 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
-import { Button } from 'reactstrap';
 
 class Nav extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      isLoggedIn: this.props.isLoggedIn
+      isLoggedIn: this.props.isLoggedIn,
+      name: this.props.name,
     }
   }
 
   handleLogOut = (e) => {
-    console.log('logout plz!!');
+    this.props.dispatch({
+      type: "USER_LOGOUT_REQUEST",
+    });
+    window.location = '/';
   }
 
   render() {
     let logInOrOut = this.state.isLoggedIn
       ? <span onClick={this.handleLogOut} className='nav-link'>Log Out</span>
-      : <Link to="/" className='nav-link'>Log In</Link>;
+      : <Link to="/">Log In</Link>;
     return (
       <nav>
         <ul>
+          <li>{this.state.name}</li>
           <li>
             {logInOrOut}
           </li>
