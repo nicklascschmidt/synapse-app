@@ -42,7 +42,7 @@ class Main extends Component {
         this.setState({ error: null });
         this.tryTransactionSubmit(this.state);
       } else {
-        this.setState({ error: 'Please enter a dollar amount (max $100).' });
+        this.setState({ error: 'Please enter a positive dollar amount (max $100).' });
       }
     } else {
       this.setState({ error: 'Please select an account first.' });
