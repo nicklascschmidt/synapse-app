@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import axios from 'axios';
-import { Row, Col, Form, FormGroup, Button, Input, Label } from 'reactstrap';
+import { Row, Col } from 'reactstrap';
 import Error from '../../components/error/error';
-import SubmittedMsg from '../../components/submittedMsg/submittedMsg';
 import Nodes from '../../components/nodes/nodes';
+import TransactionForm from '../../components/transactions/transactionForm';
+import Example from '../../components/graph/graph';
 
 class Main extends Component {
   constructor(props) {
@@ -13,12 +14,9 @@ class Main extends Component {
     this.state = {
       isLoggedIn: this.props.isLoggedIn,
       userId: this.props.userId,
-      transactionAmt: 0,
       error: null,
       userLoaded: false,
       activeNodeId: null,
-      showMessage: null,
-      confirmationMessage: null,
     }
   }
 
@@ -30,63 +28,6 @@ class Main extends Component {
     if (loginUserComplete) {
       this.setState({ userLoaded: true });
     }
-  }
-
-  // Button will not show until userLoaded=true. activeNodeId is set on radio button click (on a Node/Account).
-  // Validate transaction input. Submit transaction if valid. Else, show error.
-  handleSubmit = (e) => {
-    e.preventDefault();
-    if (this.state.activeNodeId) {
-      let isValid = this.validateTransactionInput(this.state.transactionAmt);
-      if (isValid) {
-        this.setState({ error: null });
-        this.tryTransactionSubmit(this.state);
-      } else {
-        this.setState({ error: 'Please enter a positive dollar amount (max $100).' });
-      }
-    } else {
-      this.setState({ error: 'Please select an account first.' });
-    }
-  }
-
-  // If input has non-numbers or is over $100, return false and show error.
-  validateTransactionInput = (amt) => {
-    let amtFixed = amt.trim();
-    let isOnlyNumbers = /^\d+$/.test(amtFixed); // only allow numbers (and spaces on each end)
-    let amtNum = parseFloat(amtFixed);
-
-    if (!isOnlyNumbers || amtNum > 100) { // max $100 - unknown, but should be capped (not at $100, but fine for testing)
-      return false
-    } else {
-      return true
-    }
-  }
-
-  // Submit the transaction and show confirmation message if success, error if fail.
-  tryTransactionSubmit = (state) => {
-    let { userId, transactionAmt, activeNodeId } = state;
-    let params = { userId, transactionAmt, activeNodeId };
-    axios
-      .get(`/transactions/add`, { params })
-      .then(resp => {
-        if (resp.status !== 200) {
-          this.setState({ error: 'Connection error. Please try again.' });
-          return
-        }
-        // Show confirmation message for 3 seconds.
-        this.setState({
-          showMessage: true,
-          confirmationMessage: 'Transaction submitted!'
-        });
-        setTimeout(this.hideMessage, 3*1000);
-      })
-      .catch(err => {
-        this.setState({ error: 'We ran into an error submitting your transaction. Please reload the page or try logging in again.' });
-      });
-  }
-
-  hideMessage = () => {
-    this.setState({ showMessage: false });
   }
 
   // Loads 'user' var in server.js. userId comes from Redux store.
@@ -122,24 +63,15 @@ class Main extends Component {
             {this.state.userLoaded && <Nodes switchActiveNode={this.switchActiveNode} />}
           </Col>
           <Col>
-            <Form onSubmit={this.handleSubmit}>
-              <FormGroup>
-                <Label>Submit a Transaction (USD):</Label>
-                <Input
-                  style={{ width: '10rem', margin: 'auto' }}
-                  type="text"
-                  value={this.state.transactionAmt}
-                  onChange={e => this.setState({ transactionAmt: e.target.value })}
-                />
-              </FormGroup>
-              {this.state.userLoaded
-                ? <Button type="submit" style={{ display: 'block', margin: 'auto' }}>Submit</Button>
-                : <p>loading...</p>}
-            </Form>
+            {(this.state.userLoaded && this.state.activeNodeId)
+              ? <TransactionForm userId={this.state.userId} activeNodeId={this.state.activeNodeId} />
+              : <p>Please select an account to make transactions.</p>}
           </Col>
         </Row>
-        <Error>{this.state.error && this.state.error}</Error>
-        <SubmittedMsg>{this.state.showMessage && this.state.confirmationMessage}</SubmittedMsg>
+        <Error>{this.state.error}</Error>
+        <Row>
+          <Example />
+        </Row>
       </div>)
 
     return (
@@ -153,7 +85,7 @@ class Main extends Component {
 
 function mapStateToProps(state) {
   return {
-    name: state.name,
+    // name: state.name,
     userId: state.userId,
     isLoggedIn: state.isLoggedIn
   };
