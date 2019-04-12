@@ -19,7 +19,6 @@ class CreateNewUser extends Component {
     e.preventDefault();
 
     let isValid = this.validateUserInput(this.state.name);
-    console.log(isValid);
     if (isValid) {
       this.setState({ error: null });
       this.createNewUser(this.state.name);
@@ -43,8 +42,8 @@ class CreateNewUser extends Component {
       .then(resp => {
         let name = resp.data.json.legal_names[0];
         let userId = resp.data.json._id;
-        // this.sendToRedux(name, userId, this.reroutePage);
-        // this.createNewNode();
+        this.sendToRedux(name, userId, this.reroutePage);
+        this.createNewNode();
       })
       .catch(err => {
         this.setState({ error: 'Unable to create account. Please reload the page and try again.' });

@@ -141,26 +141,6 @@ app.get('/nodes/create', (req, res) => {
       }
     }
   );
-
-  // let mfa;
-
-  // Nodes.create(
-  //   user,
-  //   achPayload,
-  //   function(err, nodeResponse) {
-  //     // error with MFA questions or node object
-  //     mfa = err.body.mfa;
-  //     console.log('mfa',mfa);
-  //     nodes = nodesResponse;
-  //     console.log('nodesResponse',nodesResponse);
-  //     if (err) {
-  //       res.status(err.status).send(err.body);
-  //     } else {
-  //       // res.send(nodesResponse);
-  //       console.log('\nsuccess\n');
-  //     }
-  //   }
-  // );
 });
   
 

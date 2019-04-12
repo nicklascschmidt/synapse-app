@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Error from '../error/error';
 import NodeForm from './nodeForm';
+// import testNodes from './testNodes'; // comment in when testing
 
 class Nodes extends Component {
   constructor(props) {
@@ -10,6 +11,7 @@ class Nodes extends Component {
     this.state = {
       userNodesAreLoaded: null,
       userNodes: [],
+      // userNodes: testNodes, // comment in when testing
       nodeArrayIsEmpty: null,
     }
   }
@@ -27,7 +29,7 @@ class Nodes extends Component {
           this.setState({ error: 'Connection error. Please try again.' });
           return
         }
-        console.log('resp',resp);
+
         let nodeArray = resp.data;
         let nodeArrayLength = resp.data.length;
 
@@ -45,8 +47,8 @@ class Nodes extends Component {
       });
   }
 
+  // On radio button click, fire parent func to switch activeNode. Then get activeNode for server.
   changeRadio = (e) => {
-    // Fire parent func to switch activeNode. Then get activeNode for server.
     let nodeId = e.target.value;
     this.props.switchActiveNode(nodeId);
     this.getActiveNode(nodeId);
@@ -74,27 +76,3 @@ class Nodes extends Component {
 }
 
 export default Nodes;
-
-
-
-
-
-
-// For testing
-
-// userNodes: [
-//   {
-//     _id: 'idBoa123',
-//     info: {
-//       bank_name: 'BOA',
-//       nickname: 'my boa checking acct'
-//     }
-//   },
-//   {
-//     _id: 'idChase987',
-//     info: {
-//       bank_name: 'Chase',
-//       nickname: 'my chase savings acct'
-//     }
-//   }
-// ],
