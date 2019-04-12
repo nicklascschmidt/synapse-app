@@ -14,9 +14,26 @@ class CreateNewUser extends Component {
     }
   }
 
+  // Validate input on submit. If valid, create a new user with that name (and clear the error). Else, show error.
   handleSubmit = (e) => {
     e.preventDefault();
-    this.createNewUser(this.state.name);
+
+    let isValid = this.validateUserInput(this.state.name);
+    console.log(isValid);
+    if (isValid) {
+      this.setState({ error: null });
+      this.createNewUser(this.state.name);
+    } else {
+      this.setState({ error: 'Please enter a name under 50 characters using only letters and spaces' });
+    }
+  }
+
+  validateUserInput = (name) => {
+    let nameFixed = name.replace(/\s\s+/g, ' ').trim(); // replace multiple spaces with one space, trim ends
+    if (nameFixed.length > 50) { // max 50 characters - unknown DB validation, but seems reasonable??
+      return false;
+    }
+    return /^[a-zA-Z\s]*$/.test(nameFixed); // only allow letters and spaces
   }
 
   // Create the user in API, then send user info to Redux.
@@ -26,8 +43,8 @@ class CreateNewUser extends Component {
       .then(resp => {
         let name = resp.data.json.legal_names[0];
         let userId = resp.data.json._id;
-        this.sendToRedux(name, userId, this.reroutePage);
-        this.createNewNode();
+        // this.sendToRedux(name, userId, this.reroutePage);
+        // this.createNewNode();
       })
       .catch(err => {
         this.setState({ error: 'Unable to create account. Please reload the page and try again.' });

@@ -63,10 +63,13 @@ app.get('/user/login/:id', (req, res) => {
 
 // Create a User on home page (login)
 app.get('/user/create/:name', (req, res) => {
+  let name = req.params.name;
+  let emailName = name.replace(/\s/g, ''); // clear all white space out of string for email
+
   const createPayload = {
     logins: [
       {
-        email: `jsTestUser${req.params.name}@synapsepay.com`,
+        email: `jsTestUser${emailName}@synapsepay.com`,
         read_only: false
       }
     ],
@@ -74,10 +77,10 @@ app.get('/user/create/:name', (req, res) => {
       '901.111.1111'
     ],
     legal_names: [
-      `${req.params.name}`
+      `${name}`
     ],
     extra: {
-      note: `Test user: ${req.params.name}`,
+      note: `Test user: ${name}`,
       supp_id: '122eddfgbeafrfvbbb',
       is_business: false
     }

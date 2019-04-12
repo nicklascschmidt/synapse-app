@@ -6,9 +6,16 @@ class Nav extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      isLoggedIn: null,
+      name: null,
+    }
+  }
+
+  componentWillMount = () => {
+    this.setState({
       isLoggedIn: this.props.isLoggedIn,
       name: this.props.name,
-    }
+    });
   }
 
   handleLogOut = (e) => {
@@ -25,7 +32,7 @@ class Nav extends Component {
     return (
       <nav>
         <ul>
-          <li>{this.state.isLoggedIn && this.state.name}</li>
+          <li>{this.state.isLoggedIn && `Logged in: ${this.state.name}`}</li>
           <li>
             {logInOrOut}
           </li>
