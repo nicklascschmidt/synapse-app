@@ -20,12 +20,10 @@ class CreateNewUser extends Component {
 
     let isValid = this.validateUserInput(this.state.name);
     if (isValid) {
-      console.log('valid!')
-      // this.setState({ error: null });
-      // this.createNewUser(this.state.name);
+      this.setState({ error: null });
+      this.createNewUser(this.state.name);
     } else {
-      console.log('NOT valid!')
-      // this.setState({ error: 'Please enter a name under 50 characters using only letters and spaces' });
+      this.setState({ error: 'Please enter a name under 50 characters using only letters and spaces' });
     }
   }
 
@@ -39,7 +37,7 @@ class CreateNewUser extends Component {
   // Create the user in API, then send user info to Redux.
   createNewUser = (name) => {
     axios
-      .get(`/user/create/${name}`)
+      .post(`/user/create/${name}`)
       .then(resp => {
         let name = resp.data.json.legal_names[0];
         let userId = resp.data.json._id;
@@ -54,7 +52,7 @@ class CreateNewUser extends Component {
   // Create the node in API to user for transactions in the app.
   createNewNode = () => {
     axios
-      .get('/nodes/create')
+      .post('/nodes/create')
       .then(resp => resp)
       .catch(err => {
         this.setState({ error: 'Unable to create account node. Please reload the page and try again.' });

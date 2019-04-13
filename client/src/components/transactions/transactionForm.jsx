@@ -31,15 +31,9 @@ class TransactionForm extends Component {
     }
   }
 
-  clearError = () => {
-    if (this.state.error !== null) {
-      this.setState({ error: null });
-    }
-  }
-
   // If input has non-numbers || is 0 || is over $100, return false and show error.
   validateTransactionInput = (amt) => {
-    let amtFixed = (amt !== 0) && amt.trim(); // .trim shows error on 0 input
+    let amtFixed = (amt !== 0) && amt.trim(); // .trim() shows error on 0 input
     let isOnlyNumbers = /^\d+$/.test(amtFixed); // only allow numbers (and spaces on each end)
     let amtNum = parseFloat(amtFixed); // convert to #
 
@@ -52,7 +46,7 @@ class TransactionForm extends Component {
     let { userId, transactionAmt, activeNodeId } = state;
     let params = { userId, transactionAmt, activeNodeId };
     axios
-      .get(`/transactions/add`, { params })
+      .post(`/transactions/create`, null, { params })
       .then(resp => {
         if (resp.status !== 200) {
           this.setState({ error: 'Connection error. Please try again.' });
@@ -72,6 +66,12 @@ class TransactionForm extends Component {
 
   hideMessage = () => {
     this.setState({ showMessage: false });
+  }
+
+  clearError = () => {
+    if (this.state.error !== null) {
+      this.setState({ error: null });
+    }
   }
 
   render() {

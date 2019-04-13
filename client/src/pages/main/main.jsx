@@ -5,7 +5,7 @@ import { Row, Col } from 'reactstrap';
 import Error from '../../components/error/error';
 import Nodes from '../../components/nodes/nodes';
 import TransactionForm from '../../components/transactions/transactionForm';
-import Example from '../../components/graph/graph';
+import TransactionGraph from '../../components/transactions/transactionGraph';
 
 class Main extends Component {
   constructor(props) {
@@ -17,6 +17,7 @@ class Main extends Component {
       error: null,
       userLoaded: false,
       activeNodeId: null,
+      activeNodeIsLoaded: false,
     }
   }
 
@@ -54,25 +55,33 @@ class Main extends Component {
     });
   }
 
+  markNodesAsLoaded = () => {
+    this.setState({
+      activeNodeIsLoaded: true
+    });
+  }
+
   render() {
     let mainDisplay = !this.state.isLoggedIn
       ? <p>Please log in first</p>
       : (<div>
           <Row>
-          <Col>
-            {this.state.userLoaded && <Nodes switchActiveNode={this.switchActiveNode} />}
-          </Col>
-          <Col>
-            {(this.state.userLoaded && this.state.activeNodeId)
-              ? <TransactionForm userId={this.state.userId} activeNodeId={this.state.activeNodeId} />
-              : <p>Please select an account to make transactions.</p>}
-          </Col>
-        </Row>
-        <Error>{this.state.error}</Error>
-        <Row>
-          <Example />
-        </Row>
-      </div>)
+            <Col>
+              {this.state.userLoaded && <Nodes switchActiveNode={this.switchActiveNode} markNodesAsLoaded={this.markNodesAsLoaded} />}
+            </Col>
+            <Col>
+              {(this.state.userLoaded && this.state.activeNodeId)
+                ? <TransactionForm userId={this.state.userId} activeNodeId={this.state.activeNodeId} />
+                : <p>Please select an account to make transactions.</p>}
+            </Col>
+          </Row>
+          <Error>{this.state.error}</Error>
+          <Row>
+            {(this.state.userLoaded && this.state.activeNodeIsLoaded)
+              ? <TransactionGraph activeNodeId={this.state.activeNodeId} />
+              : <p>Please select an account to view transaction history.</p>}
+          </Row>
+        </div>);
 
     return (
       <div>

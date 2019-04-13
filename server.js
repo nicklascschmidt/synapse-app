@@ -36,6 +36,8 @@ let user;
 let nodes;
 let node;
 let transaction;
+let transactions;
+
 
 // Get user from API with userId, save in 'user' var.
 app.get('/user/login/:id', (req, res) => {
@@ -62,7 +64,7 @@ app.get('/user/login/:id', (req, res) => {
 });
 
 // Create a User on home page (login)
-app.get('/user/create/:name', (req, res) => {
+app.post('/user/create/:name', (req, res) => {
   let name = req.params.name;
   let emailName = name.replace(/\s/g, ''); // clear all white space out of string for email
 
@@ -107,7 +109,7 @@ app.get('/user/create/:name', (req, res) => {
 // ------------------- Nodes --------------------------
 
 // Create node on home page, function called after user is created.
-app.get('/nodes/create', (req, res) => {
+app.post('/nodes/create', (req, res) => {
 
   // Add ACH-US Node through Account and Routing Number Details
   const achPayload = {
@@ -124,16 +126,13 @@ app.get('/nodes/create', (req, res) => {
       supp_id: '123sa'
     }
   };
-  console.log('achPayload',achPayload);
 
   Nodes.create(
     user,
     achPayload,
     function(err, nodesResponse) {
-      // error or node object
       // node will only have RECEIVE permission until verified with micro-deposits
       nodes = nodesResponse;
-      console.log('nodesResponse',nodesResponse);
       if (err) {
         res.status(err.status).send(err.body);
       } else {
@@ -142,7 +141,6 @@ app.get('/nodes/create', (req, res) => {
     }
   );
 });
-  
 
 // Get All Nodes
 app.get('/nodes/get-all', (req, res) => {
@@ -189,12 +187,11 @@ app.get('/nodes/get-one/:id', (req, res) => {
 const Transactions = SynapsePay.Transactions;
 
 // Create transaction
-app.get('/transactions/add', async (req, res) => {
+app.post('/transactions/create', (req, res) => {
   // params accessible in req.query
-  console.log('HIT /transactions/add');
-  // console.log('user',user);
+  console.log('HIT /transactions/create');
 
-  // Create a Transaction. Ignore fees bc not production.
+  // Create a Transaction. Ignore fees bc not actual/production.
   const createPayload = {
     to: {
       type: 'SYNAPSE-US',
@@ -210,23 +207,15 @@ app.get('/transactions/add', async (req, res) => {
       webhook: 'http://requestb.in/q94kxtq9',
       process_on: 1,
       ip: Helpers.getUserIP()
-    },
-    // fees: [{
-    //   fee: 1.00,
-    //   note: 'Facilitator Fee',
-    //   to: {
-    //     id: FEE_TO_NODE_ID
-    //   }
-    // }]
+    }
   };
 
   Transactions.create(
     node,
     createPayload,
     function (err, transactionResp) {
-      // error or transaction object
       transaction = transactionResp;
-      console.log('transaction',transaction);
+
       if (err) {
         res.status(err.status).send(err.body);
       } else {
@@ -236,6 +225,23 @@ app.get('/transactions/add', async (req, res) => {
   );
 });
 
+
+// Get All Transactions. 'node' var is loaded before transactions are pulled.
+app.get('/transactions/get-all', (req, res) => {
+  Transactions.get(
+    node,
+    null,
+    function(err, transactionsResp) {
+      transactions = transactionsResp;
+
+      if (err) {
+        res.status(err.status).send(err.body);
+      } else {
+        res.send(transactionsResp);
+      }
+    }
+  );
+});
 
 
 

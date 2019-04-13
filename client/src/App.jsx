@@ -6,7 +6,6 @@ import Main from './pages/main/main';
 import Nav from './components/nav/nav';
 import { Container } from 'reactstrap';
 
-
 class App extends Component {
   state = {
 

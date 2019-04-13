@@ -57,7 +57,9 @@ class Nodes extends Component {
   getActiveNode = (nodeId) => {
     axios
       .get(`/nodes/get-one/${nodeId}`)
-      .then(resp => resp)
+      .then(resp => {
+        this.props.markNodesAsLoaded();
+      })
       .catch(err => {
         this.setState({ error: 'Error loading node. Please reload the page.' });
       });
