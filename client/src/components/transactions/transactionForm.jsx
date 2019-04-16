@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, FormGroup, Button, Input, Label } from 'reactstrap';
+import { Form, FormGroup, Button, Input } from 'reactstrap';
 import axios from 'axios';
 import Error from '../error/error';
 import SubmittedMsg from '../submittedMsg/submittedMsg';
@@ -25,7 +25,7 @@ class TransactionForm extends Component {
     let isValid = this.validateTransactionInput(this.state.transactionAmt);
     if (isValid) {
       this.clearError();
-      this.tryTransactionSubmit(this.state);
+      this.tryTransactionSubmit();
     } else {
       this.setState({ error: 'Please enter a positive dollar amount (max $100).' });
     }
@@ -42,8 +42,8 @@ class TransactionForm extends Component {
   }
 
   // Submit the transaction and show confirmation message if success, error if fail.
-  tryTransactionSubmit = (state) => {
-    let { userId, transactionAmt, activeNodeId } = state;
+  tryTransactionSubmit = () => {
+    let { userId, transactionAmt, activeNodeId } = this.state;
     let params = { userId, transactionAmt, activeNodeId };
     axios
       .post(`/transactions/create`, null, { params })
@@ -52,12 +52,13 @@ class TransactionForm extends Component {
           this.setState({ error: 'Connection error. Please try again.' });
           return
         }
-        // Show confirmation message for 3 seconds.
+        // Update graph through Main component func addTransactionToGraph. Show confirmation message for 3 seconds.
+        this.props.addTransactionToGraph(transactionAmt);
         this.setState({
           showMessage: true,
           confirmationMessage: 'Transaction submitted!'
         });
-        setTimeout(this.hideMessage, 3*1000);
+        setTimeout(this.hideMessage, 3 * 1000);
       })
       .catch(err => {
         this.setState({ error: 'We ran into an error submitting your transaction. Please reload the page or try logging in again.' });
@@ -76,17 +77,20 @@ class TransactionForm extends Component {
 
   render() {
     return (
-      <Form onSubmit={this.handleSubmit}>
-        <FormGroup>
-          <Label>Submit a Transaction (USD):</Label>
+      <Form onSubmit={this.handleSubmit} inline>
+          <span style={{ margin: '.5rem 1rem' }}>Amount (USD):</span>
+        <FormGroup style={{}}>
           <Input
-            style={{ width: '10rem', margin: 'auto' }}
+            style={{margin:'auto'}}
             type="text"
             value={this.state.transactionAmt}
             onChange={e => this.setState({ transactionAmt: e.target.value })}
           />
         </FormGroup>
-        <Button type="submit" style={{ display: 'block', margin: 'auto' }}>Submit</Button>
+        <Button
+          type="submit"
+          style={{ display: 'inline-block', margin: '.5rem auto' }}
+          color='primary'>Submit</Button>
         <SubmittedMsg>{this.state.showMessage && this.state.confirmationMessage}</SubmittedMsg>
         <Error>{this.state.error}</Error>
       </Form>

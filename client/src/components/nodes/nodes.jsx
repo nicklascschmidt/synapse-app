@@ -4,6 +4,8 @@ import Error from '../error/error';
 import NodeForm from './nodeForm';
 // import testNodes from './testNodes'; // comment in when testing
 
+// When testing, comment in testNodes in import and state, then take out the userNodesAreLoaded=true requirement in render()
+
 class Nodes extends Component {
   constructor(props) {
     super(props)
@@ -68,7 +70,6 @@ class Nodes extends Component {
   render() {
     return (
       <div>
-        <h4>Accounts</h4>
         {this.state.nodeArrayIsEmpty && 'No nodes to show.'}
         {this.state.userNodesAreLoaded && <NodeForm userNodes={this.state.userNodes} changeRadio={this.changeRadio} />}
         <Error>{this.state.error}</Error>

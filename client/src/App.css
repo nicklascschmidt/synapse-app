@@ -11,18 +11,6 @@ a:hover {
   text-decoration: none;
 }
 
-.nav-link {
-  color: #61dafb;
-}
-.nav-link:hover {
-  color: white;
-  cursor: pointer;
-}
-
-ul {
-  list-style-type: none;
-}
-
 .wrapper {
   background-color: #282c34;
   color: white;

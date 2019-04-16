@@ -9,7 +9,7 @@ class Login extends Component {
     super(props)
 
     this.state = {
-      userId: '5cad5098eaf3f30067380c7c',
+      userId: '',
       error: null,
     }
   }
@@ -19,9 +19,9 @@ class Login extends Component {
     this.tryUserLogin(this.state);
   }
 
+  // Get user from the API with userId.
+  // If the user exists (userId), send user data to Redux and reroute page to Main. Else, show error.
   tryUserLogin = (state) => {
-    // Get user from the API with userId.
-    // If the user exists (userId), send user data to Redux and reroute page to Main. Else, show error.
     let { userId } = state;
     axios
       .get(`/user/login/${userId}`)
@@ -65,7 +65,7 @@ class Login extends Component {
               onChange={e => this.setState({ userId: e.target.value })}
             />
           </FormGroup>
-          <Button type="submit" style={{ display: 'block', margin: 'auto' }}>Submit</Button>
+          <Button type="submit" style={{ display: 'block', margin: 'auto' }} color='primary'>Submit</Button>
         </Form>
         <Error>{this.state.error && this.state.error}</Error>
       </div>

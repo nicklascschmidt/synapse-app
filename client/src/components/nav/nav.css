@@ -1,0 +1,13 @@
+
+.nav-link-style {
+  color: #61dafb;
+}
+.nav-link-style:hover {
+  color: white;
+  cursor: pointer;
+}
+
+/* class comes from reactstrap */
+.nav-item {
+  margin: 0 1rem;
+}

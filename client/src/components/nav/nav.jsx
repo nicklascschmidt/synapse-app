@@ -1,13 +1,29 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
+import {
+  Collapse,
+  Navbar,
+  NavbarToggler,
+  Nav,
+  NavItem,
+} from 'reactstrap';
+import './nav.css';
 
-class Nav extends Component {
+
+const navText = {
+  color: '#61dafb',
+  border: '1px solid white',
+  padding: '5px',
+}
+
+class NavbarComponent extends Component {
   constructor(props) {
     super(props)
     this.state = {
       isLoggedIn: null,
       name: null,
+      isOpen: false,
     }
   }
 
@@ -25,26 +41,37 @@ class Nav extends Component {
     window.location = '/';
   }
 
+  toggle = () => {
+    this.setState({
+      isOpen: !this.state.isOpen
+    });
+  }
+
   render() {
     let logInOrOut = this.state.isLoggedIn
-      ? <span onClick={this.handleLogOut} className='nav-link'>Log Out</span>
+      ? <span onClick={this.handleLogOut} className='nav-link-style'>Log Out</span>
       : <Link to="/">Log In</Link>;
     return (
-      <nav>
-        <ul>
-          <li>{this.state.isLoggedIn && `Logged in: ${this.state.name}`}</li>
-          <li>
-            {logInOrOut}
-          </li>
-          <li>
-            <Link to="/main">Main</Link>
-          </li>
-        </ul>
-      </nav>
+      <Navbar color="dark" light expand="md">
+        <span style={{ fontSize:'2rem' }}>Synapse App</span>
+        <NavbarToggler onClick={this.toggle} />
+        <Collapse isOpen={this.state.isOpen} navbar>
+          <Nav className="ml-auto" navbar>
+            <NavItem className='nav-link-style'>
+              {logInOrOut}
+            </NavItem>
+            <NavItem className='nav-link-style'>
+              <Link to="/main">Account</Link>
+            </NavItem>
+            <NavItem>
+              {this.state.isLoggedIn && <span style={navText}>{this.state.name}</span>}
+            </NavItem>
+          </Nav>
+        </Collapse>
+      </Navbar>
     )
   }
 }
-
 
 function mapStateToProps(state) {
   return {
@@ -53,4 +80,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps)(Nav);
+export default connect(mapStateToProps)(NavbarComponent);

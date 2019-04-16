@@ -86,7 +86,7 @@ class CreateNewUser extends Component {
               onChange={e => this.setState({ name: e.target.value })}
             />
           </FormGroup>
-          <Button type="submit" style={{ display: 'block', margin: 'auto' }}>Submit</Button>
+          <Button type="submit" style={{ display: 'block', margin: 'auto' }} color='primary'>Submit</Button>
         </Form>
         <Error>{this.state.error && this.state.error}</Error>
       </div>
