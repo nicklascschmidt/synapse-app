@@ -64,9 +64,11 @@ class Main extends Component {
     });
   }
 
-  // Fired on TransactionForm submit. newData is transaction amt. setState updates the graph component w/ updated props.newTransactionData
+  // Fired on TransactionForm submit. newData is transaction amt. setState updates graph component w/ updated props.newTransactionData
   addTransactionToGraph = (newData) => {
-    this.setState({ newTransactionData: newData });
+    this.setState({ newTransactionData: newData }, () => {
+      this.setState({ newTransactionData: null });
+    });
   }
 
   render() {

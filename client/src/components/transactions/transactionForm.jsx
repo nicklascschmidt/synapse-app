@@ -18,7 +18,7 @@ class TransactionForm extends Component {
     }
   }
 
-  // Validate transaction input. Submit transaction if valid. Else, show error.
+  // Validate transaction input. If valid, submit transaction and clear form. Else, show error.
   handleSubmit = (e) => {
     e.preventDefault();
 
@@ -26,6 +26,7 @@ class TransactionForm extends Component {
     if (isValid) {
       this.clearError();
       this.tryTransactionSubmit();
+      this.setState({ transactionAmt: 0 });
     } else {
       this.setState({ error: 'Please enter a positive dollar amount (max $100).' });
     }
@@ -77,7 +78,7 @@ class TransactionForm extends Component {
 
   render() {
     return (
-      <Form onSubmit={this.handleSubmit} inline>
+      <Form inline>
           <span style={{ margin: '.5rem 1rem' }}>Amount (USD):</span>
         <FormGroup style={{}}>
           <Input
@@ -88,9 +89,10 @@ class TransactionForm extends Component {
           />
         </FormGroup>
         <Button
-          type="submit"
+          type="button"
           style={{ display: 'inline-block', margin: '.5rem auto' }}
-          color='primary'>Submit</Button>
+          color='primary'
+          onClick={this.handleSubmit}>Submit</Button>
         <SubmittedMsg>{this.state.showMessage && this.state.confirmationMessage}</SubmittedMsg>
         <Error>{this.state.error}</Error>
       </Form>

@@ -49,7 +49,6 @@ class TransactionGraph extends Component {
       .get(`/transactions/get-all`)
       .then(resp => {
         if (resp.status === 200) {
-          console.log('resp.data.trans',resp.data.trans);
           return resp.data.trans
         }
       })
@@ -83,6 +82,7 @@ class TransactionGraph extends Component {
   render() {
     return (
       <div>
+        <h4>Transactions</h4>
         {(this.state.chartData.length > 0)
           ? <Graph chartData={this.state.chartData} />
           : <p>No transactions to show.</p>}
