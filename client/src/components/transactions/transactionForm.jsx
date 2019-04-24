@@ -89,7 +89,7 @@ class TransactionForm extends Component {
           />
         </FormGroup>
         <Button
-          type="button"
+          type="submit"
           style={{ display: 'inline-block', margin: '.5rem auto' }}
           color='primary'
           onClick={this.handleSubmit}>Submit</Button>
