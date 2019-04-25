@@ -1,5 +1,5 @@
 {
-  "name": "Synapse React/Redux Server App",
+  "name": "Synapse React Redux Server App",
   "version": "1.0.0",
   "scripts": {
     "client": "cd client && yarn start",
