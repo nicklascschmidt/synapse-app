@@ -1,5 +1,5 @@
 {
-  "name": "example-create-react-app-express",
+  "name": "Synapse React/Redux App",
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:5000/",
