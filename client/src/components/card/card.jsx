@@ -1,20 +1,12 @@
-import React, { Component } from 'react';
-import { Card } from 'reactstrap';
+import styled from 'styled-components';
 
-const cardStyle = {
-  backgroundColor: '#62656B',
-  padding: '1rem',
-  margin: '.5rem',
-}
+const Card = styled.div`
+  background-color: var(--secondary-background-color);
+  border: none;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: ${props => props.margin || '.5rem'};
+  width: ${props => props.width || null};
+`;
 
-class CardComponent extends Component {
-  render() {
-    return (
-      <Card style={cardStyle}>
-        {this.props.children}
-      </Card>
-    )
-  }
-}
-
-export default CardComponent;
+export default Card;

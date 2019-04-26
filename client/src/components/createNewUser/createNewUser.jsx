@@ -22,6 +22,7 @@ class CreateNewUser extends Component {
     }
   }
 
+  // For testing
   componentDidMount = () => {
     this.setState({
       legalName: 'test user',
