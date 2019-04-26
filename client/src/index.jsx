@@ -17,24 +17,30 @@ import { loadState, saveState } from './localstorage';
 const persistedState = loadState();
 
 const initialState = {
-  name: null,
+  legalName: null,
+  email: null,
+  phoneNumber: null,
   userId: null,
-  isLoggedIn: false,
+  isLoggedIn: false
 }
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case 'USER_LOGIN_REQUEST':
-      console.log('global state updated - user logged in');
+      console.log('global state updated - user logged in',action.payload);
       return {
-        name: action.payload.name,
+        legalName: action.payload.legalName,
+        email: action.payload.email,
+        phoneNumber: action.payload.phoneNumber,
         userId: action.payload.userId,
         isLoggedIn: action.payload.isLoggedIn,
       }
     case 'USER_LOGOUT_REQUEST':
       console.log('global state updated - user logged out');
       return {
-        name: null,
+        legalName: null,
+        email: null,
+        phoneNumber: null,
         userId: null,
         isLoggedIn: false
       }

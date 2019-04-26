@@ -1,47 +1,65 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import { Form, FormGroup, Button, Input, Label } from 'reactstrap';
+import Form from '../form/form';
+import FormGroup from '../form/formGroup';
+import Input from '../form/input';
+import Label from '../form/label';
+import Button from '../button/button';
 import axios from 'axios';
 import Error from '../error/error';
+import { validateUserInputs } from './userValidation';
 
 class CreateNewUser extends Component {
   constructor(props) {
     super(props)
     
     this.state = {
-      name: '',
+      legalName: '',
+      email: '',
+      phoneNumber: '',
       error: null,
+      validationErrors: []
     }
+  }
+
+  componentDidMount = () => {
+    this.setState({
+      legalName: 'test user',
+      email: 'test@test.com',
+      phoneNumber: '1234567890',
+    })
+  }
+
+  handleChange = (event) => {
+    let { name, value } = event.target;
+    this.setState({
+      [name]: value
+    });
   }
 
   // Validate input on submit. If valid, create a new user with that name (and clear the error). Else, show error.
   handleSubmit = (e) => {
     e.preventDefault();
 
-    let isValid = this.validateUserInput(this.state.name);
-    if (isValid) {
-      this.setState({ error: null });
-      this.createNewUser(this.state.name);
+    let { legalName, email, phoneNumber } = this.state;
+    let userObj = { legalName, email, phoneNumber };
+    let errorObj = validateUserInputs(userObj);
+    if (errorObj.isValid) {
+      this.createNewUser(userObj);
+      this.setState({ errors: null, validationErrors: null });
     } else {
-      this.setState({ error: 'Please enter a name under 50 characters using only letters and spaces' });
+      this.setState({ validationErrors: errorObj.errors });
     }
   }
 
-  validateUserInput = (name) => {
-    let nameFixed = name.replace(/\s\s+/g, ' ').trim(); // replace multiple spaces with one space, trim ends
-    let isLengthValid = (nameFixed.length > 50) ? false : true; // max 50 characters - unknown DB validation, but seems reasonable??
-    let isTypeValid = /^[a-zA-Z\s]*$/.test(nameFixed); // make sure only contains letters and spaces
-    return (isLengthValid && isTypeValid) ? true : false;
-  }
-
   // Create the user in API, then send user info to Redux.
-  createNewUser = (name) => {
+  createNewUser = (userObj) => {
     axios
-      .post(`/user/create/${name}`)
+      .post(`/user/create`,userObj)
       .then(resp => {
-        let name = resp.data.json.legal_names[0];
-        let userId = resp.data.json._id;
-        this.sendToRedux(name, userId, this.reroutePage);
+        console.log('resp',resp);
+        let { legal_names, logins, phone_numbers, _id } = resp.data.json;
+        this.sendToRedux(legal_names[0], logins[0].email, phone_numbers[0], _id, this.reroutePage);
         this.createNewNode();
       })
       .catch(err => {
@@ -63,8 +81,8 @@ class CreateNewUser extends Component {
     window.location = '/main';
   }
 
-  sendToRedux = (name, userId, rerouteCB) => {
-    let userData = { name, userId, isLoggedIn: true };
+  sendToRedux = (legalName, email, phoneNumber, userId, rerouteCB) => {
+    let userData = { legalName, email, phoneNumber, userId, isLoggedIn: true };
     this.props.dispatch({
       type: "USER_LOGIN_REQUEST",
       payload: userData
@@ -78,16 +96,40 @@ class CreateNewUser extends Component {
         <h3>Create New User</h3>
         <Form onSubmit={this.handleSubmit}>
           <FormGroup>
-            <Label>Name:</Label>
-            <Input
-              style={{ width: '20rem', margin: 'auto' }}
-              type="text"
-              value={this.state.name}
-              onChange={e => this.setState({ name: e.target.value })}
-            />
+            <Label htmlFor="legalName">Legal Name:</Label>
+              <Input
+                type="text"
+                id="legalName"
+                name="legalName"
+                value={this.state.legalName}
+                onChange={e => this.handleChange(e)}
+              />
           </FormGroup>
-          <Button type="submit" style={{ display: 'block', margin: 'auto' }} color='primary'>Submit</Button>
+          <FormGroup>
+            <Label htmlFor="email">Email:</Label>
+              <Input
+                type="text"
+                id="email"
+                name="email"
+                value={this.state.email}
+                onChange={e => this.handleChange(e)}
+              />
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="phoneNumber">Phone Number:</Label>
+              <Input
+                type="text"
+                id="phoneNumber"
+                name="phoneNumber"
+                value={this.state.phoneNumber}
+                onChange={e => this.handleChange(e)}
+              />
+          </FormGroup>
+          <div>
+            <Button type="submit">Submit</Button>
+          </div>
         </Form>
+        {(this.state.validationErrors) && this.state.validationErrors.map( (err,i) => <Error key={i}>{err}</Error> )}
         <Error>{this.state.error && this.state.error}</Error>
       </div>
     )
@@ -96,7 +138,9 @@ class CreateNewUser extends Component {
 
 function mapStateToProps(state) {
   return {
-    name: state.name,
+    legalName: state.legalName,
+    email: state.email,
+    phoneNumber: state.phoneNumber,
     userId: state.userId,
     isLoggedIn: state.isLoggedIn
   };

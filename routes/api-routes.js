@@ -58,25 +58,23 @@ module.exports = app => {
   });
 
   // Create a User on home page (login)
-  app.post('/user/create/:name', (req, res) => {
-    let name = req.params.name;
-    let emailName = name.replace(/\s/g, ''); // clear all white space out of string for email
-
+  app.post('/user/create', (req, res) => {
+    let { legalName, email, phoneNumber } = req.body;
     const createPayload = {
       logins: [
         {
-          email: `jsTestUser${emailName}@synapsepay.com`,
+          email,
           read_only: false
         }
       ],
       phone_numbers: [
-        '901.111.1111'
+        phoneNumber
       ],
       legal_names: [
-        `${name}`
+        legalName
       ],
       extra: {
-        note: `Test user: ${name}`,
+        note: `Test user: ${legalName}`,
         supp_id: '122eddfgbeafrfvbbb',
         is_business: false
       }

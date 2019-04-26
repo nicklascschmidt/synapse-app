@@ -21,17 +21,10 @@ class NavbarComponent extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      isLoggedIn: null,
-      name: null,
+      isLoggedIn: this.props.isLoggedIn,
+      legalName: this.props.legalName,
       isOpen: false,
     }
-  }
-
-  componentWillMount = () => {
-    this.setState({
-      isLoggedIn: this.props.isLoggedIn,
-      name: this.props.name,
-    });
   }
 
   handleLogOut = (e) => {
@@ -64,7 +57,7 @@ class NavbarComponent extends Component {
               <Link to="/main">Account</Link>
             </NavItem>
             <NavItem>
-              {this.state.isLoggedIn && <span style={navText}>{this.state.name}</span>}
+              {this.state.isLoggedIn && <span style={navText}>{this.state.legalName}</span>}
             </NavItem>
           </Nav>
         </Collapse>
@@ -75,7 +68,7 @@ class NavbarComponent extends Component {
 
 function mapStateToProps(state) {
   return {
-    name: state.name,
+    legalName: state.legalName,
     isLoggedIn: state.isLoggedIn
   };
 }
