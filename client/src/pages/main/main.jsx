@@ -6,7 +6,7 @@ import Error from '../../components/error/error';
 import Nodes from '../../components/nodes/nodes';
 import TransactionForm from '../../components/transactions/transactionForm';
 import TransactionGraph from '../../components/transactions/transactionGraph';
-import CardComponent from '../../components/card/card';
+import Card from '../../components/card/card';
 
 
 class Main extends Component {
@@ -39,14 +39,11 @@ class Main extends Component {
     return axios
       .get(`/user/login/${userId}`)
       .then(resp => {
-        if (resp.status !== 200) {
-          this.setState({ error: 'Connection error. Please try again.' });
-          return
-        }
+        if (resp.status !== 200) throw new Error('We ran into an error loading your account. Please reload the page or log in again.');
         return true
       })
       .catch(err => {
-        this.setState({ error: 'We ran into an error loading your account. Please reload the page or log in again.' });
+        this.setState({ error: err.props });
       });
   }
 
@@ -59,9 +56,7 @@ class Main extends Component {
   }
 
   markNodesAsLoaded = () => {
-    this.setState({
-      activeNodeIsLoaded: true
-    });
+    this.setState({ activeNodeIsLoaded: true });
   }
 
   // Fired on TransactionForm submit. newData is transaction amt. setState updates graph component w/ updated props.newTransactionData
@@ -78,34 +73,34 @@ class Main extends Component {
         <Error>{this.state.error}</Error>
         <Row>
           <Col>
-            <CardComponent>
+            <Card>
               <h4>Accounts</h4>
               {this.state.userLoaded ? <Nodes switchActiveNode={this.switchActiveNode} markNodesAsLoaded={this.markNodesAsLoaded} /> : <p>Loading...</p>}
-            </CardComponent>
+            </Card>
           </Col>
           <Col>
-            <CardComponent>
+            <Card>
               <h4>Create a Transaction</h4>
               {(this.state.userLoaded && this.state.activeNodeId)
                 ? <TransactionForm userId={this.state.userId} activeNodeId={this.state.activeNodeId} addTransactionToGraph={this.addTransactionToGraph} />
                 : <p>Please select an account to make transactions.</p>}
-            </CardComponent>
+            </Card>
           </Col>
         </Row>
         <Row>
           <Col>
-            <CardComponent>
+            <Card>
               {(this.state.userLoaded && this.state.activeNodeIsLoaded)
                 ? <TransactionGraph activeNodeId={this.state.activeNodeId} newTransactionData={this.state.newTransactionData} />
                 : <p>Please select an account to view transaction history.</p>}
-            </CardComponent>
+            </Card>
           </Col>
         </Row>
       </div>);
 
     return (
       <div>
-        {this.props.name ? <h3>{this.props.name}'s Synapse Account</h3> : <h3>Synapse Account</h3>}
+        {this.props.legalName ? <h3>{this.props.legalName}'s Synapse Account</h3> : <h3>Synapse Account</h3>}
         {mainDisplay}
       </div>
     )
@@ -114,7 +109,7 @@ class Main extends Component {
 
 function mapStateToProps(state) {
   return {
-    name: state.name,
+    legalName: state.legalName,
     userId: state.userId,
     isLoggedIn: state.isLoggedIn
   };

@@ -28,14 +28,12 @@ class CreateNewUser extends Component {
       legalName: 'test user',
       email: 'test@test.com',
       phoneNumber: '1234567890',
-    })
+    });
   }
 
   handleChange = (event) => {
     let { name, value } = event.target;
-    this.setState({
-      [name]: value
-    });
+    this.setState({ [name]: value });
   }
 
   // Validate input on submit. If valid, create a new user with that name (and clear the error). Else, show error.
@@ -58,7 +56,6 @@ class CreateNewUser extends Component {
     axios
       .post(`/user/create`,userObj)
       .then(resp => {
-        console.log('resp',resp);
         let { legal_names, logins, phone_numbers, _id } = resp.data.json;
         this.sendToRedux(legal_names[0], logins[0].email, phone_numbers[0], _id, this.reroutePage);
         this.createNewNode();
@@ -126,9 +123,7 @@ class CreateNewUser extends Component {
                 onChange={e => this.handleChange(e)}
               />
           </FormGroup>
-          <div>
-            <Button type="submit">Submit</Button>
-          </div>
+          <Button type="submit">Submit</Button>
         </Form>
         {(this.state.validationErrors) && this.state.validationErrors.map( (err,i) => <Error key={i}>{err}</Error> )}
         <Error>{this.state.error && this.state.error}</Error>

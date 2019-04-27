@@ -57,7 +57,7 @@ module.exports = app => {
     );
   });
 
-  // Create a User on home page (login)
+  // Create a User on home page (login) - auto-upload KYC for Send-and-Receive access
   app.post('/user/create', (req, res) => {
     let { legalName, email, phoneNumber } = req.body;
     const createPayload = {
@@ -75,9 +75,45 @@ module.exports = app => {
       ],
       extra: {
         note: `Test user: ${legalName}`,
-        supp_id: '122eddfgbeafrfvbbb',
         is_business: false
-      }
+      },
+      documents: [
+        {
+          email,
+          phone_number: phoneNumber,
+          ip: '::1',
+          name: legalName,
+          alias: legalName,
+          entity_type: 'M',
+          entity_scope: 'Arts & Entertainment',
+          day: 2,
+          month: 5,
+          year: 1989,
+          address_street: '1 Market St.',
+          address_city: 'SF',
+          address_subdivision: 'CA',
+          address_postal_code: '94105',
+          address_country_code: 'US',
+          virtual_docs: [
+            {
+              document_value: '2222',
+              document_type: 'SSN'
+            }
+          ],
+          physical_docs: [
+            {
+              document_value: 'data:image/gif;base64,SUQs==',
+              document_type: 'GOVT_ID'
+            }
+          ],
+          social_docs: [
+            {
+              document_value: 'https://www.facebook.com/valid',
+              document_type: 'FACEBOOK'
+            }
+          ]
+        }
+      ]
     };
 
     Users.create(
@@ -103,19 +139,13 @@ module.exports = app => {
   // Create node on home page, function called after user is created.
   app.post('/nodes/create', (req, res) => {
 
-    // Add ACH-US Node through Account and Routing Number Details
+    // Add ACH-US Node through Account and Routing Number Details. This is a fake account that doesn't require MFA.
     const achPayload = {
       type: 'ACH-US',
       info: {
-        nickname: 'Node Library Checking Account',
-        name_on_account: 'Node Library',
-        account_num: '72347235423',
-        routing_num: '051000017',
-        type: 'PERSONAL',
-        class: 'CHECKING'
-      },
-      extra: {
-        supp_id: '123sa'
+        bank_id: 'synapse_nomfa',
+        bank_pw: 'test1234',
+        bank_name: 'fake'
       }
     };
 
@@ -177,13 +207,14 @@ module.exports = app => {
 
   // Create transaction - Ignore fees bc not actual/production. params accessible in req.query
   app.post('/transactions/create', (req, res) => {
+    let { activeNodeId, transactionAmt } = req.body;
     const createPayload = {
       to: {
         type: 'SYNAPSE-US',
-        id: req.query.activeNodeId // TO_NODE_ID
+        id: activeNodeId // TO_NODE_ID
       },
       amount: {
-        amount: parseFloat(req.query.transactionAmt),
+        amount: parseFloat(transactionAmt),
         currency: 'USD'
       },
       extra: {

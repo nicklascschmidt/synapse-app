@@ -18,40 +18,41 @@ class Nodes extends Component {
     }
   }
 
-  componentWillMount = () => {
+  componentDidMount = async () => {
     this.getNodes();
+    let nodeArray = await this.getNodes();
+    if (nodeArray) {
+      this.setState({
+        userNodes: nodeArray,
+        userNodesAreLoaded: true
+      });
+      let startingNodeId = nodeArray[0]._id;
+      this.changeRadio(startingNodeId);
+    } else {
+      this.setState({ nodeArrayIsEmpty: true });
+    }
   }
 
   // Get nodes and save into this.state. If the nodeArray is empty, then display msg (nodeArrayIsEmpty=true).
   getNodes = () => {
-    axios
+    return axios
       .get('/nodes/get-all')
       .then(resp => {
-        if (resp.status !== 200) {
-          this.setState({ error: 'Connection error. Please try again.' });
-          return
-        }
+        if (resp.status !== 200) throw new Error('Error loading nodes. Please reload the page.');
 
         let nodeArray = resp.data;
-        let nodeArrayLength = resp.data.length;
-
-        if (nodeArrayLength > 0) {
-          this.setState({
-            userNodes: nodeArray,
-            userNodesAreLoaded: true
-          });
-        } else {
-          this.setState({ nodeArrayIsEmpty: true });
+        if (nodeArray.length > 0) {
+          return nodeArray
         }
+        return false
       })
       .catch(err => {
-        this.setState({ error: 'Error loading nodes. Please reload the page.' });
+        this.setState({ error: err.props });
       });
   }
 
-  // On radio button click, fire parent func to switch activeNode. Then get activeNode for server.
-  changeRadio = (e) => {
-    let nodeId = e.target.value;
+  // On load OR on radio button click, fire parent func to switch activeNode. Then get activeNode for server.
+  changeRadio = (nodeId) => {
     this.props.switchActiveNode(nodeId);
     this.getActiveNode(nodeId);
   }

@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import axios from 'axios';
+import Form from '../form/form';
+import FormGroup from '../form/formGroup';
+import Input from '../form/input';
+import Label from '../form/label';
+import Button from '../button/button';
 import Error from '../error/error';
-import { Form, FormGroup, Button, Input, Label } from 'reactstrap';
 
 class Login extends Component {
   constructor(props) {
@@ -12,6 +16,10 @@ class Login extends Component {
       userId: '',
       error: null,
     }
+  }
+
+  componentDidMount = () => {
+    this.setState({ userId: '5cc3c116a9da8c00667cb074' });
   }
 
   handleSubmit = (e) => {
@@ -26,15 +34,12 @@ class Login extends Component {
     axios
       .get(`/user/login/${userId}`)
       .then(resp => {
-        if (resp.status === 200) {
-          let name = resp.data.legal_names[0];
-          this.sendToRedux(name, userId, this.reroutePage);
-        } else {
-          this.setState({ error: 'Connection error. Please try again.' });
-        }
+        if (resp.status !== 200) throw new Error('Unable to locate account. Please try another User ID.')
+        let { legal_names, logins, phone_numbers, _id } = resp.data;
+        this.sendToRedux(legal_names[0], logins[0].email, phone_numbers[0], _id, this.reroutePage);
       })
       .catch(err => {
-        this.setState({ error: 'Unable to locate account. Please try another User ID.' });
+        this.setState({ error: err });
       });
   }
 
@@ -42,13 +47,18 @@ class Login extends Component {
     window.location = '/main';
   }
 
-  sendToRedux = (name, userId, rerouteCB) => {
-    let userData = { name, userId, isLoggedIn: true };
+  sendToRedux = (legalName, email, phoneNumber, userId, rerouteCB) => {
+    let userData = { legalName, email, phoneNumber, userId, isLoggedIn: true };
     this.props.dispatch({
       type: "USER_LOGIN_REQUEST",
       payload: userData
     });
     rerouteCB();
+  }
+
+  handleChange = (event) => {
+    let { name, value } = event.target;
+    this.setState({ [name]: value });
   }
 
   render() {
@@ -57,15 +67,16 @@ class Login extends Component {
         <h3>Login</h3>
         <Form onSubmit={this.handleSubmit}>
           <FormGroup>
-            <Label>User ID:</Label>
+            <Label htmlFor="userId">User ID:</Label>
             <Input
-              style={{ width: '20rem', margin: 'auto' }}
               type="text"
+              id="userId"
+              name="userId"
               value={this.state.userId}
-              onChange={e => this.setState({ userId: e.target.value })}
+              onChange={e => this.handleChange(e)}
             />
           </FormGroup>
-          <Button type="submit" style={{ display: 'block', margin: 'auto' }} color='primary'>Submit</Button>
+          <Button type="submit">Submit</Button>
         </Form>
         <Error>{this.state.error && this.state.error}</Error>
       </div>
@@ -75,7 +86,9 @@ class Login extends Component {
 
 function mapStateToProps(state) {
   return {
-    name: state.name,
+    legalName: state.legalName,
+    email: state.email,
+    phoneNumber: state.phoneNumber,
     userId: state.userId,
     isLoggedIn: state.isLoggedIn
   };

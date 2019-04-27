@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
-import { Form, FormGroup, Button, Input } from 'reactstrap';
 import axios from 'axios';
+// import { Form, FormGroup, Button, Input } from 'reactstrap';
+import Form from '../form/form';
+import FormGroup from '../form/formGroup';
+import Input from '../form/input';
+import Label from '../form/label';
+import Button from '../button/button';
 import Error from '../error/error';
 import SubmittedMsg from '../submittedMsg/submittedMsg';
 
@@ -22,14 +27,16 @@ class TransactionForm extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
 
-    let isValid = this.validateTransactionInput(this.state.transactionAmt);
-    if (isValid) {
-      this.clearError();
-      this.tryTransactionSubmit();
-      this.setState({ transactionAmt: 0 });
-    } else {
-      this.setState({ error: 'Please enter a positive dollar amount (max $100).' });
-    }
+    console.log('handleSubmit!!!',this.state.transactionAmt);
+
+    // let isValid = this.validateTransactionInput(this.state.transactionAmt);
+    // if (isValid) {
+    //   this.clearError();
+    //   this.tryTransactionSubmit();
+    //   this.setState({ transactionAmt: 0 });
+    // } else {
+    //   this.setState({ error: 'Please enter a positive dollar amount (max $100).' });
+    // }
   }
 
   // If input has non-numbers || is 0 || is over $100, return false and show error.
@@ -76,16 +83,22 @@ class TransactionForm extends Component {
     }
   }
 
+  handleChange = (event) => {
+    let { name, value } = event.target;
+    this.setState({ [name]: value });
+  }
+
   render() {
     return (
       <Form inline>
-          <span style={{ margin: '.5rem 1rem' }}>Amount (USD):</span>
         <FormGroup style={{}}>
+          <Label htmlFor="transactionAmt">Amount (USD):</Label>
           <Input
-            style={{margin:'auto'}}
             type="text"
+            id="transactionAmt"
+            name="transactionAmt"
             value={this.state.transactionAmt}
-            onChange={e => this.setState({ transactionAmt: e.target.value })}
+            onChange={e => this.handleChange(e)}
           />
         </FormGroup>
         <Button
