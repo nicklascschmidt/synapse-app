@@ -21,13 +21,15 @@ const initialState = {
   email: null,
   phoneNumber: null,
   userId: null,
-  isLoggedIn: false
+  isLoggedIn: false,
+  activeNodeId: null,
 }
 
 const reducer = (state = initialState, action) => {
+  console.log('REDUX STATE',state);
   switch (action.type) {
     case 'USER_LOGIN_REQUEST':
-      console.log('global state updated - user logged in',action.payload);
+      // console.log('global state updated - user logged in',action.payload);
       return {
         legalName: action.payload.legalName,
         email: action.payload.email,
@@ -36,13 +38,18 @@ const reducer = (state = initialState, action) => {
         isLoggedIn: action.payload.isLoggedIn,
       }
     case 'USER_LOGOUT_REQUEST':
-      console.log('global state updated - user logged out');
+      // console.log('global state updated - user logged out');
       return {
         legalName: null,
         email: null,
         phoneNumber: null,
         userId: null,
-        isLoggedIn: false
+        isLoggedIn: false,
+      }
+    case 'UPDATE_activeNodeId':
+      // console.log('global state updated - activeNodeId updated',action.payload.activeNodeId);
+      return {
+        activeNodeId: action.payload.activeNodeId,
       }
     default:
       return state;

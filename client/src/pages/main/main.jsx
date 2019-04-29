@@ -19,15 +19,17 @@ class Main extends Component {
       error: null,
       userLoaded: false,
       activeNodeId: null,
-      activeNodeIsLoaded: false,
+      // activeNodeIsLoaded: false,
       newTransactionData: null,
     }
   }
 
   // First GET the user object in server.js. Nodes & Transaction API calls won't work without the user object loaded.
-  // When complete, get the nodes and show in display.
-  // Then show the submit button (i.e. allow user to submit transactions).
-  componentWillMount = async () => {
+  // When complete, get the nodes and show in display (nodeForm).
+  // Then show the transaction submit button (i.e. allow user to submit transactions).
+  componentDidMount = async () => {
+    console.log('this.props',this.props)
+    console.log('this.state',this.state)
     let loginUserComplete = await this.loginUser(this.state.userId);
     if (loginUserComplete) {
       this.setState({ userLoaded: true });
@@ -47,23 +49,21 @@ class Main extends Component {
       });
   }
 
-  // Passed to Nodes component via props. Fires on radio button switch. nodeId is passed up through the function.
-  switchActiveNode = (nodeId) => {
-    this.setState({
-      activeNodeId: nodeId,
-      error: null
-    });
-  }
-
-  markNodesAsLoaded = () => {
-    this.setState({ activeNodeIsLoaded: true });
-  }
-
   // Fired on TransactionForm submit. newData is transaction amt. setState updates graph component w/ updated props.newTransactionData
   addTransactionToGraph = (newData) => {
     this.setState({ newTransactionData: newData }, () => {
       this.setState({ newTransactionData: null });
     });
+  }
+
+  // Updates state when props.activeNodeId is received from Redux
+  static getDerivedStateFromProps(props, state) {
+    if (props.activeNodeId !== state.activeNodeId) {
+      return {
+        activeNodeId: props.activeNodeId,
+      };
+    }
+    return null;
   }
 
   render() {
@@ -75,14 +75,14 @@ class Main extends Component {
           <Col>
             <Card>
               <h4>Accounts</h4>
-              {this.state.userLoaded ? <Nodes switchActiveNode={this.switchActiveNode} markNodesAsLoaded={this.markNodesAsLoaded} /> : <p>Loading...</p>}
+              {this.state.userLoaded ? <Nodes markNodesAsLoaded={this.markNodesAsLoaded} /> : <p>Loading...</p>}
             </Card>
           </Col>
           <Col>
             <Card>
               <h4>Create a Transaction</h4>
               {(this.state.userLoaded && this.state.activeNodeId)
-                ? <TransactionForm userId={this.state.userId} activeNodeId={this.state.activeNodeId} addTransactionToGraph={this.addTransactionToGraph} />
+                ? <TransactionForm userId={this.state.userId} addTransactionToGraph={this.addTransactionToGraph} />
                 : <p>Please select an account to make transactions.</p>}
             </Card>
           </Col>
@@ -90,7 +90,7 @@ class Main extends Component {
         <Row>
           <Col>
             <Card>
-              {(this.state.userLoaded && this.state.activeNodeIsLoaded)
+              {(this.state.userLoaded && this.state.activeNodeId)
                 ? <TransactionGraph activeNodeId={this.state.activeNodeId} newTransactionData={this.state.newTransactionData} />
                 : <p>Please select an account to view transaction history.</p>}
             </Card>
@@ -111,7 +111,8 @@ function mapStateToProps(state) {
   return {
     legalName: state.legalName,
     userId: state.userId,
-    isLoggedIn: state.isLoggedIn
+    isLoggedIn: state.isLoggedIn,
+    activeNodeId: state.activeNodeId,
   };
 }
 

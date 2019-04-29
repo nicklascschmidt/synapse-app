@@ -2,9 +2,6 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Error from '../error/error';
 import NodeForm from './nodeForm';
-// import testNodes from './testNodes'; // comment in when testing
-
-// When testing, comment in testNodes in import and state, then take out the userNodesAreLoaded=true requirement in render()
 
 class Nodes extends Component {
   constructor(props) {
@@ -13,21 +10,20 @@ class Nodes extends Component {
     this.state = {
       userNodesAreLoaded: null,
       userNodes: [],
-      // userNodes: testNodes, // comment in when testing
+      startingNodeId: null,
       nodeArrayIsEmpty: null,
     }
   }
 
+  // Load nodes var in server. When finished, load the nodeForm component and pass in the startingNodeId
   componentDidMount = async () => {
-    this.getNodes();
     let nodeArray = await this.getNodes();
     if (nodeArray) {
       this.setState({
         userNodes: nodeArray,
-        userNodesAreLoaded: true
+        startingNodeId: nodeArray[0]._id,
+        userNodesAreLoaded: true,
       });
-      let startingNodeId = nodeArray[0]._id;
-      this.changeRadio(startingNodeId);
     } else {
       this.setState({ nodeArrayIsEmpty: true });
     }
@@ -51,30 +47,13 @@ class Nodes extends Component {
       });
   }
 
-  // On load OR on radio button click, fire parent func to switch activeNode. Then get activeNode for server.
-  changeRadio = (nodeId) => {
-    this.props.switchActiveNode(nodeId);
-    this.getActiveNode(nodeId);
-  }
-
-  getActiveNode = (nodeId) => {
-    axios
-      .get(`/nodes/get-one/${nodeId}`)
-      .then(resp => {
-        this.props.markNodesAsLoaded();
-      })
-      .catch(err => {
-        this.setState({ error: 'Error loading node. Please reload the page.' });
-      });
-  }
-
   render() {
     return (
       <div>
         {this.state.nodeArrayIsEmpty && 'No nodes to show.'}
-        {this.state.userNodesAreLoaded && <NodeForm userNodes={this.state.userNodes} changeRadio={this.changeRadio} />}
+        {this.state.userNodesAreLoaded && <NodeForm userNodes={this.state.userNodes} startingNodeId={this.state.startingNodeId} />}
         <Error>{this.state.error}</Error>
-      </div >
+      </div>
     )
   }
 }
