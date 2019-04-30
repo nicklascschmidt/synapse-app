@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
-import Graph from '../graph/graph';
 import axios from 'axios';
 import moment from 'moment';
-// import testTransactions from './testTransactions'; // comment in for testing
-
-// When testing, comment in testTransactions in import and state, then comment out componentDidMount() func.
-// Also adjust main component requirements in render for TransactionGraph component.
+import Graph from '../graph/graph';
+import Error from '../error/error';
 
 class TransactionGraph extends Component {
   constructor(props) {
@@ -16,44 +13,37 @@ class TransactionGraph extends Component {
       activeNodeId: this.props.activeNodeId,
       error: null,
       chartData: [],
-      // chartData: testTransactions, // comment in for testing
-      newTransactionData: null,
     }
   }
 
-  // When a new transaction is submitted from transactionForm, create an object w/ new amt to add to chartData for the graph.
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.newTransactionData !== prevState.newTransactionData) {
-      let now = Date.now();
-      let nowFormatted = moment(now).format("MMM Do YY");
-      let newTransactionData = {
-        amt: nextProps.newTransactionData,
-        date: nowFormatted,
-        fullDate: now,
-      };
-      // Push new data into the chartData and rerender graph component.
-      return ({ chartData: [...prevState.chartData, newTransactionData] }) // same as setState
-    }
-    return null // must return something
+  componentDidMount = () => {
+    this.loadTransactionData();
   }
 
   // Load transaction data to pass into graph.
-  componentDidMount = async () => {
+  loadTransactionData = async () => {
     let transactionDataArray = await this.getTransactionData();
     let convertedTransactionData = this.convertTransactionData(transactionDataArray);
     this.setState({ chartData: convertedTransactionData });
+  }
+
+  // Rerender graph component when a new transaction is submitted
+  componentDidUpdate = (prevProps) => {
+    if ( prevProps.refreshTransactionGraphBool !== this.props.refreshTransactionGraphBool ) {
+      this.loadTransactionData();
+    }
   }
 
   getTransactionData = () => {
     return axios
       .get(`/transactions/get-all`)
       .then(resp => {
-        if (resp.status === 200) {
-          return resp.data.trans
-        }
+        if (resp.status !== 200) throw new Error('Error loading transactions.');
+      
+        return resp.data.trans
       })
       .catch(err => {
-        console.log('err',err);
+        this.setState({ error: err.props });
       })
   }
 
@@ -86,6 +76,7 @@ class TransactionGraph extends Component {
         {(this.state.chartData.length > 0)
           ? <Graph chartData={this.state.chartData} />
           : <p>No transactions to show.</p>}
+        <Error>{this.state.error && this.state.error}</Error>
       </div>
     )
   }

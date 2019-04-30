@@ -205,13 +205,13 @@ module.exports = app => {
   // Imports
   const Transactions = SynapsePay.Transactions;
 
-  // Create transaction - Ignore fees bc not actual/production. params accessible in req.query
+  // Create transaction - Ignore fees bc not actual/production.
   app.post('/transactions/create', (req, res) => {
-    let { activeNodeId, transactionAmt } = req.body;
+    let { transactionAmt, toNodeId, transactionDescription, categoryName } = req.body;
     const createPayload = {
       to: {
         type: 'SYNAPSE-US',
-        id: activeNodeId // TO_NODE_ID
+        id: toNodeId
       },
       amount: {
         amount: parseFloat(transactionAmt),
@@ -219,7 +219,8 @@ module.exports = app => {
       },
       extra: {
         supp_id: '1283764wqwsdd34wd13212',
-        note: 'TEST - Deposit to bank account',
+        note: `TEST: ${transactionDescription}`,
+        group_id: categoryName,
         webhook: 'http://requestb.in/q94kxtq9',
         process_on: 1,
         ip: Helpers.getUserIP()

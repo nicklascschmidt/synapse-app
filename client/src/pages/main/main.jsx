@@ -19,8 +19,8 @@ class Main extends Component {
       error: null,
       userLoaded: false,
       activeNodeId: null,
-      // activeNodeIsLoaded: false,
       newTransactionData: null,
+      refreshTransactionGraphBool: false,
     }
   }
 
@@ -28,9 +28,7 @@ class Main extends Component {
   // When complete, get the nodes and show in display (nodeForm).
   // Then show the transaction submit button (i.e. allow user to submit transactions).
   componentDidMount = async () => {
-    console.log('this.props',this.props)
-    console.log('this.state',this.state)
-    let loginUserComplete = await this.loginUser(this.state.userId);
+    let loginUserComplete = (this.state.userId) ? await this.loginUser(this.state.userId) : false;
     if (loginUserComplete) {
       this.setState({ userLoaded: true });
     }
@@ -53,6 +51,13 @@ class Main extends Component {
   addTransactionToGraph = (newData) => {
     this.setState({ newTransactionData: newData }, () => {
       this.setState({ newTransactionData: null });
+    });
+  }
+
+  refreshTransactionGraph = () => {
+    console.log('refreshTransactionGraph()!!!',this.refreshTransactionGraphBool);
+    this.setState({
+      refreshTransactionGraphBool: !this.state.refreshTransactionGraphBool
     });
   }
 
@@ -82,7 +87,7 @@ class Main extends Component {
             <Card>
               <h4>Create a Transaction</h4>
               {(this.state.userLoaded && this.state.activeNodeId)
-                ? <TransactionForm userId={this.state.userId} addTransactionToGraph={this.addTransactionToGraph} />
+                ? <TransactionForm userId={this.state.userId} refreshTransactionGraph={this.refreshTransactionGraph} />
                 : <p>Please select an account to make transactions.</p>}
             </Card>
           </Col>
@@ -91,7 +96,7 @@ class Main extends Component {
           <Col>
             <Card>
               {(this.state.userLoaded && this.state.activeNodeId)
-                ? <TransactionGraph activeNodeId={this.state.activeNodeId} newTransactionData={this.state.newTransactionData} />
+                ? <TransactionGraph activeNodeId={this.state.activeNodeId} refreshTransactionGraphBool={this.state.refreshTransactionGraphBool} />
                 : <p>Please select an account to view transaction history.</p>}
             </Card>
           </Col>

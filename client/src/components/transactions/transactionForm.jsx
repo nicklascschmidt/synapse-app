@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-// import { Form, FormGroup, Button, Input } from 'reactstrap';
 import Form from '../form/form';
 import FormGroup from '../form/formGroup';
 import Input from '../form/input';
@@ -8,6 +7,10 @@ import Label from '../form/label';
 import Button from '../button/button';
 import Error from '../error/error';
 import SubmittedMsg from '../submittedMsg/submittedMsg';
+import { validateUserInputs } from './userValidation';
+import Dropdown from '../form/dropdown';
+import transactionCategoryArray from './transactionCategoryArray';
+import exampleNodeArray from './exampleNodeArray';
 
 class TransactionForm extends Component {
   constructor(props) {
@@ -15,71 +18,71 @@ class TransactionForm extends Component {
 
     this.state = {
       userId: this.props.userId,
-      activeNodeId: this.props.activeNodeId,
-      transactionAmt: 0,
+      transactionAmt: '',
+      toNodeId: '',
+      transactionDescription: '',
+      categoryName: '',
       error: null,
       showMessage: null,
       confirmationMessage: null,
     }
   }
 
-  // Validate transaction input. If valid, submit transaction and clear form. Else, show error.
-  handleSubmit = (e) => {
+  // Validate transaction input. If valid, submit transaction. Else, show error.
+  // If transaction submits correctly, reset the form and refresh the graph component (bc new data).
+  handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log('handleSubmit!!!',this.state.transactionAmt);
+    let { transactionAmt, toNodeId, transactionDescription, categoryName } = this.state;
+    let transactionObject = { transactionAmt, toNodeId, transactionDescription, categoryName };
 
-    // let isValid = this.validateTransactionInput(this.state.transactionAmt);
-    // if (isValid) {
-    //   this.clearError();
-    //   this.tryTransactionSubmit();
-    //   this.setState({ transactionAmt: 0 });
-    // } else {
-    //   this.setState({ error: 'Please enter a positive dollar amount (max $100).' });
-    // }
-  }
-
-  // If input has non-numbers || is 0 || is over $100, return false and show error.
-  validateTransactionInput = (amt) => {
-    let amtFixed = (amt !== 0) && amt.trim(); // .trim() shows error on 0 input
-    let isOnlyNumbers = /^\d+$/.test(amtFixed); // only allow numbers (and spaces on each end)
-    let amtNum = parseFloat(amtFixed); // convert to #
-
-    // max $100 - unknown, but should be capped (not at $100, but fine for testing)
-    return (!isOnlyNumbers || amtNum <= 0 || amtNum > 100) ? false : true;
+    let errorObj = validateUserInputs(transactionObject);
+    if (errorObj.isValid) {
+      this.clearErrors();
+      let transactionSubmittedBool = await this.tryTransactionSubmit(transactionObject);
+      if (transactionSubmittedBool) {
+        this.displaySubmittedMessage();
+        this.resetForm();
+        this.props.refreshTransactionGraph();
+      }
+    } else {
+      this.setState({ validationErrors: errorObj.errors });
+    }
   }
 
   // Submit the transaction and show confirmation message if success, error if fail.
-  tryTransactionSubmit = () => {
-    let { userId, transactionAmt, activeNodeId } = this.state;
-    let params = { userId, transactionAmt, activeNodeId };
-    axios
-      .post(`/transactions/create`, null, { params })
+  tryTransactionSubmit = (transactionObject) => {
+    return axios
+      .post(`/transactions/create`, transactionObject)
       .then(resp => {
-        if (resp.status !== 200) {
-          this.setState({ error: 'Connection error. Please try again.' });
-          return
+        if (resp.status !== 200) throw new Error('We ran into an error submitting your transaction. Please reload the page or try logging in again.');
+
+        if (resp.data) {
+          return true
+        } else {
+          return false
         }
-        // Update graph through Main component func addTransactionToGraph. Show confirmation message for 3 seconds.
-        this.props.addTransactionToGraph(transactionAmt);
-        this.setState({
-          showMessage: true,
-          confirmationMessage: 'Transaction submitted!'
-        });
-        setTimeout(this.hideMessage, 3 * 1000);
       })
       .catch(err => {
-        this.setState({ error: 'We ran into an error submitting your transaction. Please reload the page or try logging in again.' });
+        this.setState({ error: err.props });
       });
+  }
+
+  displaySubmittedMessage = () => {
+    this.setState({
+      showMessage: true,
+      confirmationMessage: 'Transaction submitted!'
+    });
+    setTimeout(this.hideMessage, 3 * 1000);
   }
 
   hideMessage = () => {
     this.setState({ showMessage: false });
   }
 
-  clearError = () => {
-    if (this.state.error !== null) {
-      this.setState({ error: null });
+  clearErrors = () => {
+    if (this.state.validationErrors !== null) {
+      this.setState({ validationErrors: null });
     }
   }
 
@@ -88,10 +91,29 @@ class TransactionForm extends Component {
     this.setState({ [name]: value });
   }
 
+  // Save storedValue to state if toNodeName is updated.
+  handleDropdownChange = (event) => {
+    let { name, value } = event.target;
+    this.setState({ [name]: value });
+    let storedValue = event.target.getAttribute('data-storedvalue');
+    if (name === 'toNodeName') {
+      this.setState({ toNodeId: storedValue })
+    }
+  }
+
+  resetForm = () => {
+    this.setState({
+      transactionAmt: '',
+      toNodeId: '',
+      transactionDescription: '',
+      categoryName: '',
+    });
+  }
+
   render() {
     return (
       <Form inline>
-        <FormGroup style={{}}>
+        <FormGroup>
           <Label htmlFor="transactionAmt">Amount (USD):</Label>
           <Input
             type="text"
@@ -101,13 +123,34 @@ class TransactionForm extends Component {
             onChange={e => this.handleChange(e)}
           />
         </FormGroup>
+        <FormGroup>
+          <Label htmlFor="transactionDescription">Description:</Label>
+          <Input
+            type="text"
+            id="transactionDescription"
+            name="transactionDescription"
+            value={this.state.transactionDescription}
+            onChange={e => this.handleChange(e)}
+          />
+        </FormGroup>
+        <FormGroup>
+          <Dropdown activeValue='select' name='categoryName' array={transactionCategoryArray} handleClickFromParent={this.handleDropdownChange}>
+            <Label>Category:</Label>
+          </Dropdown>
+        </FormGroup>
+        <FormGroup>
+          <Dropdown activeValue='select' name='toNodeName' array={exampleNodeArray} handleClickFromParent={this.handleDropdownChange}>
+            <Label>Send to:</Label>
+          </Dropdown>
+        </FormGroup>
         <Button
           type="submit"
           style={{ display: 'inline-block', margin: '.5rem auto' }}
           color='primary'
           onClick={this.handleSubmit}>Submit</Button>
         <SubmittedMsg>{this.state.showMessage && this.state.confirmationMessage}</SubmittedMsg>
-        <Error>{this.state.error}</Error>
+        {(this.state.validationErrors) && this.state.validationErrors.map( (err,i) => <Error key={i}>{err}</Error> )}
+        <Error>{this.state.error && this.state.error}</Error>
       </Form>
     )
   }

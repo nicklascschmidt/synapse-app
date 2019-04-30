@@ -1,44 +1,36 @@
-export const validateUserInputs = (userObj) => {
-  let { legalName, email, phoneNumber } = userObj;
+export const validateUserInputs = (transactionObject) => {
+  let { transactionAmt, toNodeId, transactionDescription, categoryName } = transactionObject;
   let errorObj = {
     isValid: true,
     errors: []
   };
 
   // Check if any field is empty. Return false if empty
-  let isEmpty = ((legalName === '') || (email === '') || (phoneNumber === '')) ? true : false;
+  let isEmpty = ((transactionAmt === '') || (toNodeId === '') || (transactionDescription === '') || (categoryName === '')) ? true : false;
   if (isEmpty) {
     return errorObj = {
       isValid: false,
       errors: ['Please fill in all fields.']
     };
   }
-  
-  // Name Validation
-  let nameFixed = legalName.replace(/\s\s+/g, ' ').trim(); // replace multiple spaces with one space, trim ends
-  let isLengthValid = (nameFixed.length > 50) ? false : true; // max 50 characters - unknown DB validation, but seems reasonable??
-  let isTypeValid = /^[a-zA-Z\s]*$/.test(nameFixed); // make sure only contains letters and spaces
-  let isNameValid = (isLengthValid && isTypeValid) ? true : false;
-  if (!isNameValid) {
-    errorObj.errors.push('Please enter a name under 50 characters using only letters and spaces.');
+
+  // Amount - num type, capped at $100 (unknown validation, testing only)
+  let isNumRegex = /^\d+$/;
+  let isNumValid = isNumRegex.test(transactionAmt.trim());
+  let isTransactionValid = ((transactionAmt > 0) && (transactionAmt < 100)) ? true : false;
+  if (!isNumValid || !isTransactionValid) {
+    errorObj.errors.push('Please enter a positive amount (max $100).');
   }
 
-  // Email validation - regex for TESTING ONLY - source here: https://stackoverflow.com/questions/46155/how-to-validate-an-email-address-in-javascript
-  let isEmailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  let isEmailValid = isEmailRegex.test(email.trim());
-  if (!isEmailValid) {
-    errorObj.errors.push('Please enter a valid email.');
-  }
-
-  // Phone number validation
-  let isPhoneNumRegex = /^\d{10}$/;
-  let isPhoneNumValid = isPhoneNumRegex.test(phoneNumber.trim());
-  if (!isPhoneNumValid) {
-    errorObj.errors.push('Please enter a basic 10 digit phone number with no special characters.');
+  // Description - under 100 chars
+  let transactionDescriptionLength = transactionDescription.length;
+  let isTransactionDescriptionValid = (transactionDescriptionLength < 100) ? true : false;
+  if (!isTransactionDescriptionValid) {
+    errorObj.errors.push('Please enter a description under 100 characters.');
   }
 
   // Set isValid to false if any fields fail validation
-  if (!isNameValid || !isEmailValid || !isPhoneNumValid) {
+  if (!isTransactionValid || !isTransactionDescriptionValid) {
     errorObj.isValid = false;
   }
   
