@@ -27,7 +27,7 @@ const initialState = {
 }
 
 const reducer = (state = initialState, action) => {
-  console.log('REDUX STATE',state);
+  // console.log('REDUX STATE',state);
   switch (action.type) {
     case 'USER_LOGIN_REQUEST':
       // console.log('global state updated - user logged in',action.payload);

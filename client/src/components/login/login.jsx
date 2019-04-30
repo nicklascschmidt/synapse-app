@@ -19,10 +19,10 @@ class Login extends Component {
     }
   }
 
-  // For testing
-  componentDidMount = () => {
-    this.setState({ userId: '5cc3c116a9da8c00667cb074' });
-  }
+  // // For testing - hardcode userId
+  // componentDidMount = () => {
+  //   this.setState({ userId: '' });
+  // }
 
   handleSubmit = (e) => {
     e.preventDefault();

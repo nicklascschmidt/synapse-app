@@ -18,34 +18,44 @@ class CreateNewUser extends Component {
       email: '',
       phoneNumber: '',
       error: null,
-      validationErrors: []
+      validationErrors: [],
+      loading: false,
     }
   }
 
-  // For testing
-  componentDidMount = () => {
-    this.setState({
-      legalName: 'test user',
-      email: 'test@test.com',
-      phoneNumber: '1234567890',
-    });
-  }
+  // // For testing
+  // componentDidMount = () => {
+  //   this.setState({
+  //     legalName: 'test user',
+  //     email: 'test@test.com',
+  //     phoneNumber: '1234567890',
+  //   });
+  // }
 
   handleChange = (event) => {
     let { name, value } = event.target;
     this.setState({ [name]: value });
   }
 
-  // Validate input on submit. If valid, create a new user with that name (and clear the error). Else, show error.
-  handleSubmit = (e) => {
+  // Validate input on submit. If valid, create a new user and new node for the user. Else, show error.
+  handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     let { legalName, email, phoneNumber } = this.state;
     let userObj = { legalName, email, phoneNumber };
+    
     let errorObj = validateUserInputs(userObj);
     if (errorObj.isValid) {
-      this.createNewUser(userObj);
-      this.setState({ errors: null, validationErrors: null });
+      this.setState({ loading: true, validationErrors: null });
+      let userBool = await this.createNewUser(userObj);
+      let nodeBool = await this.createNewNode();
+      this.setState({ loading: false });
+
+      if (userBool && nodeBool) {
+        this.setState({ error: null });
+      } else {
+        this.setState({ error: 'Submission error. Please try again.' });
+      }
     } else {
       this.setState({ validationErrors: errorObj.errors });
     }
@@ -53,12 +63,12 @@ class CreateNewUser extends Component {
 
   // Create the user in API, then send user info to Redux.
   createNewUser = (userObj) => {
-    axios
+    return axios
       .post(`/user/create`,userObj)
       .then(resp => {
         let { legal_names, logins, phone_numbers, _id } = resp.data.json;
         this.sendToRedux(legal_names[0], logins[0].email, phone_numbers[0], _id);
-        this.createNewNode();
+        return true
       })
       .catch(err => {
         this.setState({ error: 'Unable to create account. Please reload the page and try again.' });
@@ -67,9 +77,9 @@ class CreateNewUser extends Component {
 
   // Create the node in API to user for transactions in the app.
   createNewNode = () => {
-    axios
+    return axios
       .post('/nodes/create')
-      .then(resp => resp)
+      .then(resp => true)
       .catch(err => {
         this.setState({ error: 'Unable to create account node. Please reload the page and try again.' });
       });
@@ -123,6 +133,7 @@ class CreateNewUser extends Component {
         </Form>
         {(this.state.validationErrors) && this.state.validationErrors.map( (err,i) => <Error key={i}>{err}</Error> )}
         <Error>{this.state.error && this.state.error}</Error>
+        {this.state.loading && <p>Loading...</p>}
       </div>
     )
   }

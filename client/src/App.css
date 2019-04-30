@@ -1,23 +1,27 @@
 :root {
   background-color: #282c34;
   color: white;
+  --primary-background-color: #282c34;
   --primary-element-color: #00c8ff;
   --secondary-element-color: #61dafb;
   --primary-text-color: #ffffff;
   --secondary-text-color: #333333;
+  --disabled-text-color: #cccccc;
   --secondary-background-color: #62656B;
+  --third-background-color: #4e5157;
+  --table-header-color: #8884d8;
 }
 
 a {
   color: #61dafb;
 }
 a:hover {
-  color: white;
+  color: var(--primary-text-color);
   text-decoration: none;
 }
 
 .wrapper {
-  background-color: #282c34;
-  color: white;
+  background-color: var(--primary-background-color);
+  color: var(--primary-text-color);
   text-align: center;
 }

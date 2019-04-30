@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import transactionDataFormatter from './transactionDataFormatter';
-import Graph from '../graph/graph';
-import Error from '../error/error';
+import Graph from '../../graph/graph';
+import Error from '../../error/error';
 
 class TransactionGraph extends Component {
   constructor(props) {
@@ -52,7 +52,6 @@ class TransactionGraph extends Component {
   render() {
     return (
       <div>
-        <h4>Transactions</h4>
         {(this.state.chartData.length > 0)
           ? <Graph chartData={this.state.chartData} />
           : <p>No transactions to show.</p>}

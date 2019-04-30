@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import Form from '../form/form';
-import FormGroup from '../form/formGroup';
-import Input from '../form/input';
-import Label from '../form/label';
-import Button from '../button/button';
-import Error from '../error/error';
-import SubmittedMsg from '../submittedMsg/submittedMsg';
-import { validateUserInputs } from './userValidation';
-import Dropdown from '../form/dropdown';
+import Form from '../../form/form';
+import FormGroup from '../../form/formGroup';
+import Input from '../../form/input';
+import Label from '../../form/label';
+import Button from '../../button/button';
+import Error from '../../error/error';
+import SubmittedMsg from '../../submittedMsg/submittedMsg';
+import { validateUserInputs } from '../graph/userValidation';
+import Dropdown from '../../form/dropdown';
 import transactionCategoryArray from './transactionCategoryArray';
 import exampleNodeArray from './exampleNodeArray';
 
@@ -100,9 +100,7 @@ class TransactionForm extends Component {
   resetForm = () => {
     this.setState({
       transactionAmt: '',
-      toNodeId: '',
       transactionDescription: '',
-      categoryName: '',
     });
   }
 

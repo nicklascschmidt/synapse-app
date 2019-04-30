@@ -4,10 +4,10 @@ import axios from 'axios';
 import { Row, Col } from 'reactstrap';
 import Error from '../../components/error/error';
 import Nodes from '../../components/nodes/nodes';
-import TransactionForm from '../../components/transactions/transactionForm';
-import TransactionGraph from '../../components/transactions/transactionGraph';
+import TransactionForm from '../../components/transactions/form/transactionForm';
+import TransactionGraph from '../../components/transactions/graph/transactionGraph';
 import Card from '../../components/card/card';
-
+import TransactionHistory from '../../components/transactions/table/transactionHistory';
 
 class Main extends Component {
   constructor(props) {
@@ -78,7 +78,7 @@ class Main extends Component {
         <Row>
           <Col>
             <Card>
-              <h4>Accounts</h4>
+              <h4>My Accounts</h4>
               {this.state.userLoaded ? <Nodes /> : <p>Loading...</p>}
             </Card>
           </Col>
@@ -94,9 +94,20 @@ class Main extends Component {
         <Row>
           <Col>
             <Card>
+              <h4>Transactions By Category By Day</h4>
               {(this.state.userLoaded && this.state.activeNodeId)
                 ? <TransactionGraph activeNodeId={this.state.activeNodeId} refreshTransactionGraphBool={this.state.refreshTransactionGraphBool} />
                 : <p>Please select an account to view transaction history.</p>}
+            </Card>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Card>
+              <h4>Transaction History</h4>
+              {(this.state.userLoaded && this.state.activeNodeId)
+                ? <TransactionHistory activeNodeId={this.state.activeNodeId} refreshTransactionGraphBool={this.state.refreshTransactionGraphBool} />
+                : <p>Please select an account to view transactions.</p>}
             </Card>
           </Col>
         </Row>
