@@ -6,6 +6,8 @@ import Main from './pages/main/main';
 import NavbarComponent from './components/nav/nav';
 import { Container } from 'reactstrap';
 
+import TestGraph from './components/graph/testGraph';
+
 class App extends Component {
   state = {
 
@@ -19,6 +21,7 @@ class App extends Component {
           <Container style={{padding:'2rem 0'}}>
             <Route path="/" exact component={Home} />
             <Route path="/main" component={Main} />
+            <Route path="/test" component={TestGraph} />
           </Container>
         </Router>
       </div>

@@ -23,7 +23,7 @@ class TransactionGraph extends Component {
   // Load transaction data to pass into graph.
   loadTransactionData = async () => {
     let transactionDataArray = await this.getTransactionData();
-    let convertedTransactionData = this.convertTransactionData(transactionDataArray);
+    let convertedTransactionData = this.formatTransactionData(transactionDataArray);
     this.setState({ chartData: convertedTransactionData });
   }
 
@@ -48,7 +48,7 @@ class TransactionGraph extends Component {
   }
 
   // Make an array to pass into the scatter chart. Sort data so dates line up on the X axis.
-  convertTransactionData = (array) => {
+  formatTransactionData = (array) => {
     let newArray = array.map(obj => {
       let fullDate = obj.extra.created_on;
       let date = moment(obj.extra.created_on).format("MMM Do YY");

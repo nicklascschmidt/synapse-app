@@ -9,6 +9,7 @@ import './graph.css';
 class Graph extends PureComponent {
 
   render() {
+    console.log('this.props.chartData',this.props.chartData);
     return (
       <ResponsiveContainer height={400} width="90%">
         <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
