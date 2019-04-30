@@ -31,6 +31,8 @@ class Main extends Component {
     let loginUserComplete = (this.state.userId) ? await this.loginUser(this.state.userId) : false;
     if (loginUserComplete) {
       this.setState({ userLoaded: true });
+    } else {
+      this.setState({ error: 'We ran into an error loading your account. Please reload the page or log in again.' });
     }
   }
 
@@ -40,7 +42,11 @@ class Main extends Component {
       .get(`/user/login/${userId}`)
       .then(resp => {
         if (resp.status !== 200) throw new Error('We ran into an error loading your account. Please reload the page or log in again.');
-        return true
+        if (resp.data) {
+          return true
+        } else {
+          return false
+        }
       })
       .catch(err => {
         this.setState({ error: err.props });
@@ -73,7 +79,7 @@ class Main extends Component {
           <Col>
             <Card>
               <h4>Accounts</h4>
-              {this.state.userLoaded ? <Nodes markNodesAsLoaded={this.markNodesAsLoaded} /> : <p>Loading...</p>}
+              {this.state.userLoaded ? <Nodes /> : <p>Loading...</p>}
             </Card>
           </Col>
           <Col>

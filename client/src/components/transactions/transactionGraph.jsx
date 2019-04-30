@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import moment from 'moment';
+import transactionDataFormatter from './transactionDataFormatter';
 import Graph from '../graph/graph';
 import Error from '../error/error';
 
@@ -10,7 +10,6 @@ class TransactionGraph extends Component {
 
     this.state = {
       userId: null,
-      activeNodeId: this.props.activeNodeId,
       error: null,
       chartData: [],
     }
@@ -23,13 +22,16 @@ class TransactionGraph extends Component {
   // Load transaction data to pass into graph.
   loadTransactionData = async () => {
     let transactionDataArray = await this.getTransactionData();
-    let convertedTransactionData = this.formatTransactionData(transactionDataArray);
-    this.setState({ chartData: convertedTransactionData });
+    let formattedDataArray = transactionDataFormatter(transactionDataArray);
+    this.setState({
+      chartData: formattedDataArray,
+    });
   }
 
-  // Rerender graph component when a new transaction is submitted
+  // Listen for change in activeNodeId and refreshTransactionGraphBool.
+  // Load the transaction data with the new activeNodeId when new transaction is submitted (i.e. props updated)
   componentDidUpdate = (prevProps) => {
-    if ( prevProps.refreshTransactionGraphBool !== this.props.refreshTransactionGraphBool ) {
+    if ( (prevProps.activeNodeId !== this.props.activeNodeId) || (prevProps.refreshTransactionGraphBool !== this.props.refreshTransactionGraphBool) ) {
       this.loadTransactionData();
     }
   }
@@ -45,28 +47,6 @@ class TransactionGraph extends Component {
       .catch(err => {
         this.setState({ error: err.props });
       })
-  }
-
-  // Make an array to pass into the scatter chart. Sort data so dates line up on the X axis.
-  formatTransactionData = (array) => {
-    let newArray = array.map(obj => {
-      let fullDate = obj.extra.created_on;
-      let date = moment(obj.extra.created_on).format("MMM Do YY");
-
-      let newObj = {
-        fullDate,
-        date,
-        amt: obj.amount.amount,
-      }
-      return newObj
-    });
-
-    let sortedArray = newArray.sort(function(a, b) {
-      let keyA = (a.fullDate);
-      let keyB = (b.fullDate);
-      return keyA - keyB;
-    });
-    return sortedArray
   }
 
   render() {

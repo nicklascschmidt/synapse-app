@@ -8,6 +8,7 @@ import Label from '../form/label';
 import Button from '../button/button';
 import Error from '../error/error';
 
+
 class Login extends Component {
   constructor(props) {
     super(props)
@@ -18,6 +19,7 @@ class Login extends Component {
     }
   }
 
+  // For testing
   componentDidMount = () => {
     this.setState({ userId: '5cc3c116a9da8c00667cb074' });
   }
@@ -36,24 +38,20 @@ class Login extends Component {
       .then(resp => {
         if (resp.status !== 200) throw new Error('Unable to locate account. Please try another User ID.')
         let { legal_names, logins, phone_numbers, _id } = resp.data;
-        this.sendToRedux(legal_names[0], logins[0].email, phone_numbers[0], _id, this.reroutePage);
+        this.sendToRedux(legal_names[0], logins[0].email, phone_numbers[0], _id);
       })
       .catch(err => {
         this.setState({ error: err });
       });
   }
 
-  reroutePage = () => {
-    window.location = '/main';
-  }
-
-  sendToRedux = (legalName, email, phoneNumber, userId, rerouteCB) => {
+  sendToRedux = (legalName, email, phoneNumber, userId) => {
     let userData = { legalName, email, phoneNumber, userId, isLoggedIn: true };
     this.props.dispatch({
       type: "USER_LOGIN_REQUEST",
       payload: userData
     });
-    rerouteCB();
+    this.props.displaySubmittedMessage();
   }
 
   handleChange = (event) => {

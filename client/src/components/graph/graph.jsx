@@ -1,23 +1,22 @@
-import React, { PureComponent } from 'react';
-import {
-  ScatterChart, Scatter, XAxis, YAxis, Tooltip, ResponsiveContainer
-} from 'recharts';
+import React, { Component } from 'react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './graph.css';
-  
-// static jsfiddleUrl = 'https://jsfiddle.net/alidingling/uLysj0u2/'; // reference
 
-class Graph extends PureComponent {
-
+class Graph extends Component {
   render() {
-    console.log('this.props.chartData',this.props.chartData);
+    // console.log('graph -- this.props.chartData',this.props.chartData);
     return (
       <ResponsiveContainer height={400} width="90%">
-        <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-          <XAxis type="category" dataKey="date" name="Date" unit="" stroke="white" />
-          <YAxis type="number" dataKey="amt" name="Amt" unit=" USD" stroke="white" />
-          <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-          <Scatter name="Transactions" data={this.props.chartData} fill="#61dafb" />
-        </ScatterChart>
+        <BarChart width={600} height={300} data={this.props.chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+          <XAxis dataKey="date" name="Date" unit="" stroke="white" />
+          <YAxis width={70} unit=" USD" stroke="white" />
+          <Tooltip/>
+          <Legend />
+          <Bar dataKey="Entertainment" stackId="a" fill="#8884d8" />
+          <Bar dataKey="FoodGroceries" stackId="a" fill="#82ca9d" />
+          <Bar dataKey="HousingUtilities" stackId="a" fill="#23B5D3" />
+          <Bar dataKey="PersonalCare" stackId="a" fill="#1C5D99" />
+        </BarChart>
       </ResponsiveContainer>
     );
   }

@@ -56,12 +56,8 @@ class TransactionForm extends Component {
       .post(`/transactions/create`, transactionObject)
       .then(resp => {
         if (resp.status !== 200) throw new Error('We ran into an error submitting your transaction. Please reload the page or try logging in again.');
-
-        if (resp.data) {
-          return true
-        } else {
-          return false
-        }
+        if (!resp.data) throw new Error('We ran into an error submitting your transaction. Please reload the page or try logging in again.');
+        return true
       })
       .catch(err => {
         this.setState({ error: err.props });

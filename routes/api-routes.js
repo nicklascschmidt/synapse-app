@@ -136,9 +136,8 @@ module.exports = app => {
 
   // ------------------- Nodes --------------------------
 
-  // Create node on home page, function called after user is created.
+  // Creates two nodes on home page (Cap One checking + savings test nodes), function called after user is created.
   app.post('/nodes/create', (req, res) => {
-
     // Add ACH-US Node through Account and Routing Number Details. This is a fake account that doesn't require MFA.
     const achPayload = {
       type: 'ACH-US',
@@ -193,7 +192,7 @@ module.exports = app => {
         if (err) {
           res.status(err.status).send(err.body);
         } else {
-          res.end();
+          res.send(true);
         }
       }
     );

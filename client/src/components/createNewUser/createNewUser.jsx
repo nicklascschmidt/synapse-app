@@ -57,7 +57,7 @@ class CreateNewUser extends Component {
       .post(`/user/create`,userObj)
       .then(resp => {
         let { legal_names, logins, phone_numbers, _id } = resp.data.json;
-        this.sendToRedux(legal_names[0], logins[0].email, phone_numbers[0], _id, this.reroutePage);
+        this.sendToRedux(legal_names[0], logins[0].email, phone_numbers[0], _id);
         this.createNewNode();
       })
       .catch(err => {
@@ -75,17 +75,13 @@ class CreateNewUser extends Component {
       });
   }
 
-  reroutePage = () => {
-    window.location = '/main';
-  }
-
-  sendToRedux = (legalName, email, phoneNumber, userId, rerouteCB) => {
+  sendToRedux = (legalName, email, phoneNumber, userId) => {
     let userData = { legalName, email, phoneNumber, userId, isLoggedIn: true };
     this.props.dispatch({
       type: "USER_LOGIN_REQUEST",
       payload: userData
     });
-    rerouteCB();
+    this.props.displaySubmittedMessage();
   }
 
   render() {

@@ -30,6 +30,7 @@ class Nodes extends Component {
   }
 
   // Get nodes and save into this.state. If the nodeArray is empty, then display msg (nodeArrayIsEmpty=true).
+  // Note-- nodes take more time to create on the backend. Rerouting page on timeout allows time for those to be created.
   getNodes = () => {
     return axios
       .get('/nodes/get-all')

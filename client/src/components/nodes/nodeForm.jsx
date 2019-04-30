@@ -18,9 +18,15 @@ class NodeForm extends Component {
   }
 
   // Load node var in server. Then update redux with the activeNodeId.
-  componentDidMount = async () => {
-    let activeNodeBool = await this.getActiveNode(this.state.activeNodeId);
-    if (activeNodeBool) { this.sendActiveNodeIdToRedux(this.state.activeNodeId) };
+  componentDidMount = () => {
+    this.updateActiveNode(this.state.activeNodeId);
+  }
+
+  updateActiveNode = async (activeNodeId) => {
+    let activeNodeBool = await this.getActiveNode(activeNodeId);
+    if (activeNodeBool) {
+      this.sendActiveNodeIdToRedux(activeNodeId);
+    }
   }
 
   getActiveNode = (nodeId) => {
@@ -28,6 +34,7 @@ class NodeForm extends Component {
       .get(`/nodes/get-one/${nodeId}`)
       .then(resp => {
         if (resp.status !== 200) throw new Error('Error loading node. Please reload the page.');
+        if (!resp.data) throw new Error('Error loading node. Please reload the page.');
         return true
       })
       .catch(err => {
@@ -42,13 +49,24 @@ class NodeForm extends Component {
     });
   }
 
+  handleRadioChange = (e) => {
+    let { name, value } = e.target;
+    this.setState({ [name]: value });
+    this.updateActiveNode(value);
+  }
+
   // Display nodes. The first node is checked by default.
   render() {
     let nodes = this.state.userNodes.map((item, index) => {
       return (
-        <FormGroup key={index}>
+        <FormGroup key={`nodeForm${index}`}>
           <Label check>
-            <Input type="radio" name='radioButton' value={item._id} onChange={e => this.getActiveNode(e.target.value)} checked={(index === 0) ? true : false} />{' '}
+            <Input type="radio"
+              name='activeNodeId'
+              value={item._id}
+              onChange={this.handleRadioChange}
+              checked={this.state.activeNodeId === item._id}
+            />{' '}
             <span>{item.info.bank_name}</span>
             {item.info.nickname && <span> | {item.info.nickname}</span>}
           </Label>
