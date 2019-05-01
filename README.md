@@ -1,6 +1,6 @@
 # Synapse App
 
-Banking application, which allows users to create an account, make (fake) transactions, and view those transactions in a scatter plot.
+Banking application, which allows users to create an account, make (fake) transactions, and view those transactions in a stacked bar chart as well as in a table.
 
 ## Running the Application
 
